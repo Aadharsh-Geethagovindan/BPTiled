@@ -1,0 +1,17 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8497c22324ac0a342b7a7bbcb6d05637, type: 3}
+  m_Name: BalanceSettings
+  m_EditorClassIdentifier: 
+  hpMultiplier: 1
+  speedAdd: 0
+  sigChargeMultiplier: 1

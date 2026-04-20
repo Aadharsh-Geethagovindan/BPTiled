@@ -1,0 +1,533 @@
+fileFormatVersion: 2
+guid: da31fa35f308836409ec6e0e123d8964
+TextureImporter:
+  internalIDToNameTable:
+  - first:
+      213: 6086850212166893143
+    second: dmgDebuff_0
+  - first:
+      213: 1178444303228325699
+    second: dmgDebuff_1
+  - first:
+      213: 3616483725982206432
+    second: dmgDebuff_2
+  - first:
+      213: -100514552980812457
+    second: dmgDebuff_3
+  - first:
+      213: 4541852888146842903
+    second: dmgDebuff_4
+  - first:
+      213: -3858634579998949356
+    second: dmgDebuff_5
+  - first:
+      213: 3057752928570612852
+    second: dmgDebuff_6
+  - first:
+      213: 5715217435378935494
+    second: dmgDebuff_7
+  - first:
+      213: 3668259811428560671
+    second: dmgDebuff_8
+  - first:
+      213: -556575497543083691
+    second: dmgDebuff_9
+  - first:
+      213: -8222668463970977989
+    second: dmgDebuff_10
+  - first:
+      213: 9137556234352426924
+    second: dmgDebuff_11
+  - first:
+      213: 1261820020789531213
+    second: dmgDebuff_12
+  - first:
+      213: 8231981559903032492
+    second: dmgDebuff_13
+  - first:
+      213: -9018771215935018700
+    second: dmgDebuff_14
+  - first:
+      213: -6979836485853428081
+    second: dmgDebuff_15
+  externalObjects: {}
+  serializedVersion: 13
+  mipmaps:
+    mipMapMode: 0
+    enableMipMap: 0
+    sRGBTexture: 1
+    linearTexture: 0
+    fadeOut: 0
+    borderMipMap: 0
+    mipMapsPreserveCoverage: 0
+    alphaTestReferenceValue: 0.5
+    mipMapFadeDistanceStart: 1
+    mipMapFadeDistanceEnd: 3
+  bumpmap:
+    convertToNormalMap: 0
+    externalNormalMap: 0
+    heightScale: 0.25
+    normalMapFilter: 0
+    flipGreenChannel: 0
+  isReadable: 0
+  streamingMipmaps: 0
+  streamingMipmapsPriority: 0
+  vTOnly: 0
+  ignoreMipmapLimit: 0
+  grayScaleToAlpha: 0
+  generateCubemap: 6
+  cubemapConvolution: 0
+  seamlessCubemap: 0
+  textureFormat: 1
+  maxTextureSize: 2048
+  textureSettings:
+    serializedVersion: 2
+    filterMode: 1
+    aniso: 1
+    mipBias: 0
+    wrapU: 1
+    wrapV: 1
+    wrapW: 1
+  nPOTScale: 0
+  lightmap: 0
+  compressionQuality: 50
+  spriteMode: 1
+  spriteExtrude: 1
+  spriteMeshType: 0
+  alignment: 0
+  spritePivot: {x: 0.5, y: 0.5}
+  spritePixelsToUnits: 100
+  spriteBorder: {x: 0, y: 0, z: 0, w: 0}
+  spriteGenerateFallbackPhysicsShape: 1
+  alphaUsage: 1
+  alphaIsTransparency: 1
+  spriteTessellationDetail: -1
+  textureType: 8
+  textureShape: 1
+  singleChannelComponent: 0
+  flipbookRows: 1
+  flipbookColumns: 1
+  maxTextureSizeSet: 0
+  compressionQualitySet: 0
+  textureFormatSet: 0
+  ignorePngGamma: 0
+  applyGammaDecoding: 0
+  swizzle: 50462976
+  cookieLightType: 0
+  platformSettings:
+  - serializedVersion: 4
+    buildTarget: DefaultTexturePlatform
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 0
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: Standalone
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  spriteSheet:
+    serializedVersion: 2
+    sprites:
+    - serializedVersion: 2
+      name: dmgDebuff_0
+      rect:
+        serializedVersion: 2
+        x: 160
+        y: 509
+        width: 59
+        height: 166
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 75ef739b406d87450800000000000000
+      internalID: 6086850212166893143
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: dmgDebuff_1
+      rect:
+        serializedVersion: 2
+        x: 220
+        y: 646
+        width: 31
+        height: 36
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 34fc181a9dcaa5010800000000000000
+      internalID: 1178444303228325699
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: dmgDebuff_2
+      rect:
+        serializedVersion: 2
+        x: 287
+        y: 212
+        width: 111
+        height: 441
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 0e9862fa9c4503230800000000000000
+      internalID: 3616483725982206432
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: dmgDebuff_3
+      rect:
+        serializedVersion: 2
+        x: 306
+        y: 642
+        width: 83
+        height: 181
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 75d42deeb86ea9ef0800000000000000
+      internalID: -100514552980812457
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: dmgDebuff_4
+      rect:
+        serializedVersion: 2
+        x: 338
+        y: 565
+        width: 83
+        height: 133
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 71513145327e70f30800000000000000
+      internalID: 4541852888146842903
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: dmgDebuff_5
+      rect:
+        serializedVersion: 2
+        x: 482
+        y: 543
+        width: 67
+        height: 133
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 410cf1d1b40637ac0800000000000000
+      internalID: -3858634579998949356
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: dmgDebuff_6
+      rect:
+        serializedVersion: 2
+        x: 450
+        y: 625
+        width: 14
+        height: 13
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 47c9c5e76125f6a20800000000000000
+      internalID: 3057752928570612852
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: dmgDebuff_7
+      rect:
+        serializedVersion: 2
+        x: 168
+        y: 356
+        width: 118
+        height: 219
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 6c661e91af7805f40800000000000000
+      internalID: 5715217435378935494
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: dmgDebuff_8
+      rect:
+        serializedVersion: 2
+        x: 428
+        y: 388
+        width: 113
+        height: 173
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: f1f6a0cfcd648e230800000000000000
+      internalID: 3668259811428560671
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: dmgDebuff_9
+      rect:
+        serializedVersion: 2
+        x: 541
+        y: 404
+        width: 43
+        height: 36
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 559124aa885a648f0800000000000000
+      internalID: -556575497543083691
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: dmgDebuff_10
+      rect:
+        serializedVersion: 2
+        x: 162
+        y: 333
+        width: 41
+        height: 37
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: b37f33bf89633ed80800000000000000
+      internalID: -8222668463970977989
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: dmgDebuff_11
+      rect:
+        serializedVersion: 2
+        x: 248
+        y: 257
+        width: 65
+        height: 106
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: caf7bb77bfe1fce70800000000000000
+      internalID: 9137556234352426924
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: dmgDebuff_12
+      rect:
+        serializedVersion: 2
+        x: 394
+        y: 260
+        width: 77
+        height: 135
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: d42d2ad9f92e28110800000000000000
+      internalID: 1261820020789531213
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: dmgDebuff_13
+      rect:
+        serializedVersion: 2
+        x: 482
+        y: 326
+        width: 52
+        height: 30
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: ca416932d9fdd3270800000000000000
+      internalID: 8231981559903032492
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: dmgDebuff_14
+      rect:
+        serializedVersion: 2
+        x: 201
+        y: 259
+        width: 47
+        height: 31
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 439eca3dc53e6d280800000000000000
+      internalID: -9018771215935018700
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: dmgDebuff_15
+      rect:
+        serializedVersion: 2
+        x: 445
+        y: 247
+        width: 39
+        height: 31
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: f86456662b3a22f90800000000000000
+      internalID: -6979836485853428081
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    outline: []
+    customData: 
+    physicsShape: []
+    bones: []
+    spriteID: 5e97eb03825dee720800000000000000
+    internalID: 0
+    vertices: []
+    indices: 
+    edges: []
+    weights: []
+    secondaryTextures: []
+    spriteCustomMetadata:
+      entries: []
+    nameFileIdTable:
+      dmgDebuff_0: 6086850212166893143
+      dmgDebuff_1: 1178444303228325699
+      dmgDebuff_10: -8222668463970977989
+      dmgDebuff_11: 9137556234352426924
+      dmgDebuff_12: 1261820020789531213
+      dmgDebuff_13: 8231981559903032492
+      dmgDebuff_14: -9018771215935018700
+      dmgDebuff_15: -6979836485853428081
+      dmgDebuff_2: 3616483725982206432
+      dmgDebuff_3: -100514552980812457
+      dmgDebuff_4: 4541852888146842903
+      dmgDebuff_5: -3858634579998949356
+      dmgDebuff_6: 3057752928570612852
+      dmgDebuff_7: 5715217435378935494
+      dmgDebuff_8: 3668259811428560671
+      dmgDebuff_9: -556575497543083691
+  mipmapLimitGroupName: 
+  pSDRemoveMatte: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

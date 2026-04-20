@@ -1,0 +1,1100 @@
+{
+    "fighters": [
+        {
+            "name": "Arkhe",
+            "hp": 150,
+            "speed": 4,
+            "rarity": "UR",
+            "sigChargeReq": 10,
+            "imageName": "Arkhe",
+            "affiliation": "None",
+            "species": "Human",
+            "role": "Movement Utility",
+            "lore": [
+                "Arkhe is a monk from Valkun's Reach, an isolated city built beneath a stable skyborne rift in a newly contacted world on the edge of the known galaxy.",
+                "He is a wanderer, making his way through the alliance systems.",
+                "He is known primarily as an elemental monk whose body and spirit have harmonized with the leylines near the Valkun Rift."
+            ],
+            "moves": [
+                {
+                    "name": "Leyline Flow",
+                    "flavor": "Arkhe's bond with the leylines quickens his step the further he roams.",
+                    "mechanics": "For every 10 tiles Arkhe covers in movement, he gains Flighted (+2 speed) for 1 turn.",
+                    "type": "Passive",
+                    "essence": "None",
+                    "cooldown": 0,
+                    "baseSigCharge": 0,
+                    "knockback": 0,
+                    "movesUser": null,
+                    "effects": []
+                },
+                {
+                    "name": "Airburst",
+                    "flavor": "Arkhe exhales sharply, launching a compressed bolt of air at his target.",
+                    "mechanics": "Deal 30 Elemental damage to a single enemy at range 3. Knocks target back 1 tile.",
+                    "type": "Normal",
+                    "essence": "Elemental",
+                    "cooldown": 0,
+                    "baseSigCharge": 0,
+                    "knockback": 1,
+                    "movesUser": null,
+                    "effects": [
+                        {
+                            "targetType": "Enemy",
+                            "targetMode": "Shape",
+                            "damage": 30,
+                            "healing": 0,
+                            "shielding": 0,
+                            "range": 3,
+                            "minRange": 0,
+                            "shape": "Single",
+                            "shapeSize": "0",
+                            "statusEffects": [],
+                            "tileEffect": null
+                        }
+                    ]
+                },
+                {
+                    "name": "Windswept",
+                    "flavor": "With a gesture, Arkhe and a trusted ally trade places on the wind.",
+                    "mechanics": "Swap positions with a target ally within range 6.",
+                    "type": "Skill",
+                    "essence": "Elemental",
+                    "cooldown": 3,
+                    "baseSigCharge": 0,
+                    "knockback": 0,
+                    "swapWithTarget": true,
+                    "movesUser": true,
+                    "effects": [
+                        {
+                            "targetType": "Ally",
+                            "targetMode": "Shape",
+                            "damage": 0,
+                            "healing": 0,
+                            "shielding": 0,
+                            "range": 6,
+                            "minRange": 1,
+                            "shape": "Single",
+                            "shapeSize": "0",
+                            "statusEffects": [],
+                            "tileEffect": null
+                        }
+                    ]
+                },
+                {
+                    "name": "Eye of the Rift",
+                    "flavor": "Arkhe reaches through the rift, plucking an enemy from where they stand and dropping them somewhere far less comfortable.",
+                    "mechanics": "Deal 60 Elemental damage to a single enemy at range 4. Reposition the target to any tile within 3 tiles of their current location.",
+                    "type": "Signature",
+                    "essence": "Elemental",
+                    "cooldown": 0,
+                    "baseSigCharge": 0,
+                    "knockback": 0,
+                    "repositionRange": 3,
+                    "movesUser": null,
+                    "effects": [
+                        {
+                            "targetType": "Enemy",
+                            "targetMode": "Shape",
+                            "damage": 60,
+                            "healing": 0,
+                            "shielding": 0,
+                            "range": 4,
+                            "minRange": 1,
+                            "shape": "Single",
+                            "shapeSize": "0",
+                            "statusEffects": [],
+                            "tileEffect": null
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "name": "Avarice",
+            "hp": 130,
+            "speed": 2,
+            "rarity": "R",
+            "sigChargeReq": 10,
+            "imageName": "Avarice",
+            "affiliation": "Undercurrent Sanctum",
+            "species": "Del'Terran",
+            "role": "Healer",
+            "lore": [
+                "Avarice is a water-attuned cleric hailing from Del'Terah, a lush oceanic planet marked by vast fjords, sunken temples, and semi-submerged cities that was found during the second push era of alliance exploration.",
+                "She is a devout follower of the water goddess Myriel and serves as a traveling divine channeler."
+            ],
+            "moves": [
+                {
+                    "name": "Martyr's Bloom",
+                    "flavor": "",
+                    "mechanics": "On death, a 2x3 tile zone centered on Avarice gains Vitalized for 10 turns. Allies who end their turn on a Vitalized tile receive 20 healing.",
+                    "type": "Passive",
+                    "essence": "None",
+                    "cooldown": 0,
+                    "baseSigCharge": 0,
+                    "knockback": 0,
+                    "movesUser": null,
+                    "effects": []
+                },
+                {
+                    "name": "Torrent",
+                    "flavor": "",
+                    "mechanics": "Deal 20 Elemental damage to a single enemy at range 5.",
+                    "type": "Normal",
+                    "essence": "Elemental",
+                    "cooldown": 0,
+                    "baseSigCharge": 0,
+                    "knockback": 0,
+                    "movesUser": null,
+                    "effects": [
+                        {
+                            "targetType": "Enemy",
+                            "targetMode": "Shape",
+                            "damage": 20,
+                            "healing": 0,
+                            "shielding": 0,
+                            "range": 5,
+                            "minRange": 1,
+                            "shape": "Single",
+                            "shapeSize": "0",
+                            "statusEffects": [],
+                            "tileEffect": null
+                        }
+                    ]
+                },
+                {
+                    "name": "Mend",
+                    "flavor": "",
+                    "mechanics": "Restore 50 HP to a single ally within range 4.",
+                    "type": "Skill",
+                    "essence": "Elemental",
+                    "cooldown": 2,
+                    "baseSigCharge": 0,
+                    "knockback": 0,
+                    "movesUser": null,
+                    "effects": [
+                        {
+                            "targetType": "AllyOrSelf",
+                            "targetMode": "Shape",
+                            "damage": 0,
+                            "healing": 50,
+                            "shielding": 0,
+                            "range": 4,
+                            "minRange": 0,
+                            "shape": "Single",
+                            "shapeSize": "0",
+                            "statusEffects": [],
+                            "tileEffect": null
+                        }
+                    ]
+                },
+                {
+                    "name": "Sacred Ground",
+                    "flavor": "",
+                    "mechanics": "Bless a 3x3 area within range 4 for 3 turns. Allies who end their turn on a Blessed tile receive 30 healing and gain Arise (30% crit rate) for 3 turns. Arise cannot stack.",
+                    "type": "Signature",
+                    "essence": "Elemental",
+                    "cooldown": 0,
+                    "baseSigCharge": 0,
+                    "knockback": 0,
+                    "movesUser": null,
+                    "effects": [
+                        {
+                            "targetType": "Ground",
+                            "targetMode": "Shape",
+                            "damage": 0,
+                            "healing": 0,
+                            "shielding": 0,
+                            "range": 4,
+                            "minRange": 0,
+                            "shape": "Box",
+                            "shapeSize": "3x3",
+                            "statusEffects": [],
+                            "tileEffect": {
+                                "name": "Blessed",
+                                "triggerOn": "TurnEnd",
+                                "targetType": "Ally",
+                                "damage": 0,
+                                "healing": 30,
+                                "shielding": 0,
+                                "duration": 3,
+                                "applyChance": 1.0,
+                                "statusEffects": [
+                                    {
+                                        "name": "Arise",
+                                        "type": "CritRateModifier",
+                                        "magnitude": 0.3,
+                                        "duration": 3,
+                                        "isDebuff": false,
+                                        "applyChance": 1.0
+                                    }
+                                ]
+                            }
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "name": "Krakoa",
+            "hp": 230,
+            "speed": 5,
+            "rarity": "UR",
+            "sigChargeReq": 10,
+            "imageName": "Krakoa",
+            "affiliation": "Constellian Armed Forces",
+            "species": "Human",
+            "role": "Disruptor Tank",
+            "lore": [
+                "Krakoa is a Voidblade operative in the Constellian Navy's elite special forces division, originally born and trained in Silgar.",
+                "His combat instincts, while exceptional, were often flagged as dangerously aggressive. He was eventually recruited into the Constellian Navy's Voidblade program after catching the attention of a Vice Helm during a live simulation."
+            ],
+            "moves": [
+                {
+                    "name": "Battle-Scarred",
+                    "flavor": "",
+                    "mechanics": "Gains 10% Corrupt resistance and 10% Force resistance for every 100 HP lost.",
+                    "type": "Passive",
+                    "essence": "None",
+                    "cooldown": 0,
+                    "baseSigCharge": 0,
+                    "knockback": 0,
+                    "movesUser": null,
+                    "effects": []
+                },
+                {
+                    "name": "Force Strike",
+                    "flavor": "",
+                    "mechanics": "Deal 35 Force damage to a single enemy at range 3.",
+                    "type": "Normal",
+                    "essence": "Force",
+                    "cooldown": 0,
+                    "baseSigCharge": 0,
+                    "knockback": 0,
+                    "movesUser": null,
+                    "effects": [
+                        {
+                            "targetType": "Enemy",
+                            "targetMode": "Shape",
+                            "damage": 35,
+                            "healing": 0,
+                            "shielding": 0,
+                            "range": 3,
+                            "minRange": 1,
+                            "shape": "Single",
+                            "shapeSize": "0",
+                            "statusEffects": [],
+                            "tileEffect": null
+                        }
+                    ]
+                },
+                {
+                    "name": "Gale Charge",
+                    "flavor": "",
+                    "mechanics": "Deal 20 Elemental damage to all enemies in a size 3 cone originating at caster. Knocks all hit enemies back 3 tiles.",
+                    "type": "Skill",
+                    "essence": "Elemental",
+                    "cooldown": 2,
+                    "baseSigCharge": 0,
+                    "knockback": 3,
+                    "movesUser": null,
+                    "effects": [
+                        {
+                            "targetType": "Enemy",
+                            "targetMode": "Shape",
+                            "damage": 20,
+                            "healing": 0,
+                            "shielding": 0,
+                            "range": 0,
+                            "minRange": 0,
+                            "shape": "Cone",
+                            "shapeSize": "3",
+                            "statusEffects": [],
+                            "tileEffect": null
+                        }
+                    ]
+                },
+                {
+                    "name": "Reel In",
+                    "flavor": "",
+                    "mechanics": "Deal 25 Elemental damage to a single enemy at range 5. Pulls the target 2 tiles toward Krakoa.",
+                    "type": "Skill",
+                    "essence": "Elemental",
+                    "cooldown": 2,
+                    "baseSigCharge": 0,
+                    "knockback": -2,
+                    "movesUser": null,
+                    "effects": [
+                        {
+                            "targetType": "Enemy",
+                            "targetMode": "Shape",
+                            "damage": 25,
+                            "healing": 0,
+                            "shielding": 0,
+                            "range": 5,
+                            "minRange": 1,
+                            "shape": "Single",
+                            "shapeSize": "0",
+                            "statusEffects": [],
+                            "tileEffect": null
+                        }
+                    ]
+                },
+                {
+                    "name": "Shockwave",
+                    "flavor": "",
+                    "mechanics": "Deal 40 Force damage to all enemies in a size 2 ring originating at caster. Knocks all hit enemies back 2 tiles.",
+                    "type": "Signature",
+                    "essence": "Force",
+                    "cooldown": 0,
+                    "baseSigCharge": 0,
+                    "knockback": 2,
+                    "movesUser": null,
+                    "effects": [
+                        {
+                            "targetType": "Enemy",
+                            "targetMode": "Shape",
+                            "damage": 40,
+                            "healing": 0,
+                            "shielding": 0,
+                            "range": 0,
+                            "minRange": 0,
+                            "shape": "Ring",
+                            "shapeSize": "2",
+                            "statusEffects": [],
+                            "tileEffect": null
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "name": "Sanguine",
+            "hp": 150,
+            "speed": 3,
+            "rarity": "R",
+            "sigChargeReq": 8,
+            "imageName": "Sanguine",
+            "affiliation": "Silgar Sprawler Corps",
+            "species": "Human",
+            "role": "DoT Specialist",
+            "lore": [
+                "Sanguine is a Silgarian combat specialist known for her mastery of bleed-based damage.",
+                "She operates as a sanctioned solo agent under direct orders from high command. She is deployed when the Silgarians want a message sent along with the kill. When fear, suffering, and spectacle are as important as the target's elimination, Sanguine is the one for the job."
+            ],
+            "moves": [
+                {
+                    "name": "Hemorrhage",
+                    "flavor": "",
+                    "mechanics": "When Sanguine applies a DoT, there is a 15% chance for that DoT to be applied again to the same target.",
+                    "type": "Passive",
+                    "essence": "None",
+                    "cooldown": 0,
+                    "baseSigCharge": 0,
+                    "knockback": 0,
+                    "movesUser": null,
+                    "effects": []
+                },
+                {
+                    "name": "Whipcrack",
+                    "flavor": "",
+                    "mechanics": "Deal 25 Force damage to a single enemy at range 3. 10% chance to apply Cut (10 Corrupt damage per turn) for 1 turn.",
+                    "type": "Normal",
+                    "essence": "Force",
+                    "cooldown": 0,
+                    "baseSigCharge": 0,
+                    "knockback": 0,
+                    "movesUser": null,
+                    "effects": [
+                        {
+                            "targetType": "Enemy",
+                            "targetMode": "Shape",
+                            "damage": 25,
+                            "healing": 0,
+                            "shielding": 0,
+                            "range": 3,
+                            "minRange": 1,
+                            "shape": "Single",
+                            "shapeSize": "0",
+                            "statusEffects": [
+                                {
+                                    "name": "Cut",
+                                    "type": "DamageOverTime",
+                                    "essence": "Corrupt",
+                                    "magnitude": 10,
+                                    "duration": 1,
+                                    "isDebuff": true,
+                                    "applyChance": 0.1
+                                }
+                            ],
+                            "tileEffect": null
+                        }
+                    ]
+                },
+                {
+                    "name": "Wire Sweep",
+                    "flavor": "",
+                    "mechanics": "Deal 30 Corrupt damage to all enemies in a size 1 cross originating at caster. Apply Bleed (15 Corrupt damage per turn) for 2 turns.",
+                    "type": "Skill",
+                    "essence": "Corrupt",
+                    "cooldown": 2,
+                    "baseSigCharge": 0,
+                    "knockback": 0,
+                    "movesUser": null,
+                    "effects": [
+                        {
+                            "targetType": "Enemy",
+                            "targetMode": "Shape",
+                            "damage": 30,
+                            "healing": 0,
+                            "shielding": 0,
+                            "range": 0,
+                            "minRange": 0,
+                            "shape": "Cross",
+                            "shapeSize": "1",
+                            "statusEffects": [
+                                {
+                                    "name": "Bleed",
+                                    "type": "DamageOverTime",
+                                    "essence": "Corrupt",
+                                    "magnitude": 15,
+                                    "duration": 2,
+                                    "isDebuff": true,
+                                    "applyChance": 1.0
+                                }
+                            ],
+                            "tileEffect": null
+                        }
+                    ]
+                },
+                {
+                    "name": "Exsanguinate",
+                    "flavor": "",
+                    "mechanics": "Deal 60 Corrupt damage to a single enemy at range 3. All active DoT stacks on the target trigger immediately on hit without advancing their counters.",
+                    "type": "Signature",
+                    "essence": "Corrupt",
+                    "cooldown": 0,
+                    "baseSigCharge": 0,
+                    "knockback": 0,
+                    "movesUser": null,
+                    "effects": [
+                        {
+                            "targetType": "Enemy",
+                            "targetMode": "Shape",
+                            "damage": 60,
+                            "healing": 0,
+                            "shielding": 0,
+                            "range": 3,
+                            "minRange": 1,
+                            "shape": "Single",
+                            "shapeSize": "0",
+                            "statusEffects": [],
+                            "instantEffects": [
+                                {
+                                    "type": "TriggerDoTs",
+                                    "magnitude": 0,
+                                    "applyChance": 1.0
+                                }
+                            ],
+                            "tileEffect": null
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "name": "Rellin",
+            "hp": 120,
+            "speed": 3,
+            "rarity": "R",
+            "sigChargeReq": 10,
+            "imageName": "Rellin",
+            "affiliation": "Constellian Armed Forces",
+            "species": "Virellionese",
+            "role": "Sniper",
+            "lore": [
+                "Rellin is a Line Master in the Constellian Navy, hailing from the mineral-dense world of Virellion.",
+                "He leads boarding operations on compromised vessels, specializing in shock entry and power system disruption."
+            ],
+            "moves": [
+                {
+                    "name": "Deadeye",
+                    "flavor": "",
+                    "mechanics": "For every 10% accuracy Rellin has over 100%, he gains one stack of Sniper Focus (10% damage multiplier) for 1 turn.",
+                    "type": "Passive",
+                    "essence": "None",
+                    "cooldown": 0,
+                    "baseSigCharge": 0,
+                    "knockback": 0,
+                    "movesUser": null,
+                    "effects": []
+                },
+                {
+                    "name": "Precision Round",
+                    "flavor": "",
+                    "mechanics": "Deal 25 Elemental damage to a single enemy at range 7.",
+                    "type": "Normal",
+                    "essence": "Elemental",
+                    "cooldown": 0,
+                    "baseSigCharge": 0,
+                    "knockback": 0,
+                    "movesUser": null,
+                    "effects": [
+                        {
+                            "targetType": "Enemy",
+                            "targetMode": "Shape",
+                            "damage": 25,
+                            "healing": 0,
+                            "shielding": 0,
+                            "range": 7,
+                            "minRange": 1,
+                            "shape": "Single",
+                            "shapeSize": "0",
+                            "statusEffects": [],
+                            "tileEffect": null
+                        }
+                    ]
+                },
+                {
+                    "name": "Unsettling Shot",
+                    "flavor": "",
+                    "mechanics": "Deal 35 Elemental damage to a single enemy at range 8. Apply Unsettled (-10% accuracy) for 2 turns.",
+                    "type": "Skill",
+                    "essence": "Elemental",
+                    "cooldown": 2,
+                    "baseSigCharge": 0,
+                    "knockback": 0,
+                    "movesUser": null,
+                    "effects": [
+                        {
+                            "targetType": "Enemy",
+                            "targetMode": "Shape",
+                            "damage": 35,
+                            "healing": 0,
+                            "shielding": 0,
+                            "range": 8,
+                            "minRange": 1,
+                            "shape": "Single",
+                            "shapeSize": "0",
+                            "statusEffects": [
+                                {
+                                    "name": "Unsettled",
+                                    "type": "AccuracyModifier",
+                                    "magnitude": -0.1,
+                                    "duration": 2,
+                                    "isDebuff": true,
+                                    "applyChance": 1.0
+                                }
+                            ],
+                            "tileEffect": null
+                        }
+                    ]
+                },
+                {
+                    "name": "Ready, Aim...",
+                    "flavor": "",
+                    "mechanics": "Apply Steady (+35% accuracy) to Rellin for 2 turns.",
+                    "type": "Skill",
+                    "essence": "Arcane",
+                    "cooldown": 2,
+                    "baseSigCharge": 0,
+                    "knockback": 0,
+                    "movesUser": null,
+                    "effects": [
+                        {
+                            "targetType": "Self",
+                            "targetMode": "Shape",
+                            "damage": 0,
+                            "healing": 0,
+                            "shielding": 0,
+                            "range": 0,
+                            "minRange": 0,
+                            "shape": "None",
+                            "shapeSize": "0",
+                            "statusEffects": [
+                                {
+                                    "name": "Steady",
+                                    "type": "AccuracyModifier",
+                                    "magnitude": 0.35,
+                                    "duration": 2,
+                                    "isDebuff": false,
+                                    "applyChance": 1.0
+                                }
+                            ],
+                            "tileEffect": null
+                        }
+                    ]
+                },
+                {
+                    "name": "Lethal Round",
+                    "flavor": "",
+                    "mechanics": "Deal 100 Elemental damage to a single enemy at range 8.",
+                    "type": "Signature",
+                    "essence": "Elemental",
+                    "cooldown": 0,
+                    "baseSigCharge": 0,
+                    "knockback": 0,
+                    "movesUser": null,
+                    "effects": [
+                        {
+                            "targetType": "Enemy",
+                            "targetMode": "Shape",
+                            "damage": 100,
+                            "healing": 0,
+                            "shielding": 0,
+                            "range": 8,
+                            "minRange": 1,
+                            "shape": "Single",
+                            "shapeSize": "0",
+                            "statusEffects": [],
+                            "tileEffect": null
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "name": "Captain Dinso",
+            "hp": 250,
+            "speed": 3,
+            "rarity": "R",
+            "sigChargeReq": 9,
+            "imageName": "Dinso",
+            "affiliation": "Constellian Armed Forces",
+            "species": "Human",
+            "role": "Support Tank",
+            "lore": [
+                "Dinso is a decorated officer of the Constellian Army, best known as the commanding captain of the 73rd Constellian Company.",
+                "Born in Silgar, trained at StarSprawler Academy, and transferred into the Constellian forces, he rose through the ranks not just through tactical success but for his unwavering reputation as a protector and battlefield leader."
+            ],
+            "moves": [
+                {
+                    "name": "Rally",
+                    "flavor": "",
+                    "mechanics": "At the start of Dinso's turn, all allies within 4 tiles gain Inspired (20% damage multiplier) for 1 turn.",
+                    "type": "Passive",
+                    "essence": "None",
+                    "cooldown": 0,
+                    "baseSigCharge": 0,
+                    "knockback": 0,
+                    "movesUser": null,
+                    "effects": []
+                },
+                {
+                    "name": "Vanguard Strike",
+                    "flavor": "",
+                    "mechanics": "Deal 25 Force damage to a single enemy at range 3.",
+                    "type": "Normal",
+                    "essence": "Force",
+                    "cooldown": 0,
+                    "baseSigCharge": 0,
+                    "knockback": 0,
+                    "movesUser": null,
+                    "effects": [
+                        {
+                            "targetType": "Enemy",
+                            "targetMode": "Shape",
+                            "damage": 25,
+                            "healing": 0,
+                            "shielding": 0,
+                            "range": 3,
+                            "minRange": 1,
+                            "shape": "Single",
+                            "shapeSize": "0",
+                            "statusEffects": [],
+                            "tileEffect": null
+                        }
+                    ]
+                },
+                {
+                    "name": "Shield Bash",
+                    "flavor": "",
+                    "mechanics": "Deal damage to all enemies in a size 3 cone originating at caster. Knocks all hit enemies back 3 tiles.",
+                    "type": "Skill",
+                    "essence": "Force",
+                    "cooldown": 2,
+                    "baseSigCharge": 0,
+                    "knockback": 3,
+                    "movesUser": null,
+                    "effects": [
+                        {
+                            "targetType": "Enemy",
+                            "targetMode": "Shape",
+                            "damage": 0,
+                            "healing": 0,
+                            "shielding": 0,
+                            "range": 0,
+                            "minRange": 0,
+                            "shape": "Cone",
+                            "shapeSize": "3",
+                            "statusEffects": [],
+                            "tileEffect": null
+                        }
+                    ]
+                },
+                {
+                    "name": "Vanguard Assault",
+                    "flavor": "",
+                    "mechanics": "Dinso charges to a target tile within range 4. On arrival, deal Force damage to all enemies in a size 1 cross centered on the destination, knocking them back 2 tiles. Gain a 40-point shield on cast.",
+                    "type": "Signature",
+                    "essence": "Force",
+                    "cooldown": 0,
+                    "baseSigCharge": 0,
+                    "knockback": 2,
+                    "movesUser": true,
+                    "effects": [
+                        {
+                            "targetType": "Enemy",
+                            "targetMode": "Shape",
+                            "damage": 0,
+                            "healing": 0,
+                            "shielding": 0,
+                            "range": 4,
+                            "minRange": 1,
+                            "shape": "Cross",
+                            "shapeSize": "1",
+                            "statusEffects": [],
+                            "tileEffect": null
+                        },
+                        {
+                            "targetType": "Self",
+                            "targetMode": "Shape",
+                            "damage": 0,
+                            "healing": 0,
+                            "shielding": 40,
+                            "range": 0,
+                            "minRange": 0,
+                            "shape": "None",
+                            "shapeSize": "0",
+                            "statusEffects": [],
+                            "tileEffect": null
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "name": "Jack",
+            "hp": 130,
+            "speed": 3,
+            "rarity": "UC",
+            "sigChargeReq": 5,
+            "imageName": "Jack",
+            "affiliation": "Cindralith",
+            "species": "Human",
+            "role": "Saboteur",
+            "lore": [
+                "Jack is a rogue artificer and saboteur hailing from Cindralith, known for his deep understanding of arcano-technological systems and a long history of weaponized mischief.",
+                "He often appears in CAF databases as a person of interest linked to unsanctioned weapons theft, sabotage, or data extraction."
+            ],
+            "moves": [
+                {
+                    "name": "Reactive Dodge",
+                    "flavor": "",
+                    "mechanics": "When Jack takes damage, his dodge chance increases by 6%, up to a maximum of 24%.",
+                    "type": "Passive",
+                    "essence": "None",
+                    "cooldown": 0,
+                    "baseSigCharge": 0,
+                    "knockback": 0,
+                    "movesUser": null,
+                    "effects": []
+                },
+                {
+                    "name": "EMP Round",
+                    "flavor": "",
+                    "mechanics": "Deal 20 Corrupt damage to a single enemy at range 4.",
+                    "type": "Normal",
+                    "essence": "Corrupt",
+                    "cooldown": 0,
+                    "baseSigCharge": 0,
+                    "knockback": 0,
+                    "movesUser": null,
+                    "effects": [
+                        {
+                            "targetType": "Enemy",
+                            "targetMode": "Shape",
+                            "damage": 20,
+                            "healing": 0,
+                            "shielding": 0,
+                            "range": 4,
+                            "minRange": 1,
+                            "shape": "Single",
+                            "shapeSize": "0",
+                            "statusEffects": [],
+                            "tileEffect": null
+                        }
+                    ]
+                },
+                {
+                    "name": "Neural Net",
+                    "flavor": "",
+                    "mechanics": "Deal 20 Corrupt damage to all enemies in a 2x2 box at range 3. Apply Rooted (speed reduced to 0) for 1 turn.",
+                    "type": "Skill",
+                    "essence": "Corrupt",
+                    "cooldown": 2,
+                    "baseSigCharge": 0,
+                    "knockback": 0,
+                    "movesUser": null,
+                    "effects": [
+                        {
+                            "targetType": "Enemy",
+                            "targetMode": "Shape",
+                            "damage": 20,
+                            "healing": 0,
+                            "shielding": 0,
+                            "range": 3,
+                            "minRange": 1,
+                            "shape": "Box",
+                            "shapeSize": "2x2",
+                            "statusEffects": [
+                                {
+                                    "name": "Rooted",
+                                    "type": "Root",
+                                    "magnitude": 0,
+                                    "duration": 1,
+                                    "isDebuff": true,
+                                    "applyChance": 1.0
+                                }
+                            ],
+                            "tileEffect": null
+                        }
+                    ]
+                },
+                {
+                    "name": "Signal Jam",
+                    "flavor": "",
+                    "mechanics": "Apply Signal Jam (-35% accuracy) to a single enemy at range 4 for 2 turns.",
+                    "type": "Skill",
+                    "essence": "Corrupt",
+                    "cooldown": 2,
+                    "baseSigCharge": 0,
+                    "knockback": 0,
+                    "movesUser": null,
+                    "effects": [
+                        {
+                            "targetType": "Enemy",
+                            "targetMode": "Shape",
+                            "damage": 0,
+                            "healing": 0,
+                            "shielding": 0,
+                            "range": 4,
+                            "minRange": 1,
+                            "shape": "Single",
+                            "shapeSize": "0",
+                            "statusEffects": [
+                                {
+                                    "name": "Signal Jam",
+                                    "type": "AccuracyModifier",
+                                    "magnitude": -0.35,
+                                    "duration": 2,
+                                    "isDebuff": true,
+                                    "applyChance": 1.0
+                                }
+                            ],
+                            "tileEffect": null
+                        }
+                    ]
+                },
+                {
+                    "name": "Hard Reset",
+                    "flavor": "",
+                    "mechanics": "Deal 30 Corrupt damage to a single enemy at range 5. Drain 30% of their Signature charge and add 2 turns to their skill cooldowns.",
+                    "type": "Signature",
+                    "essence": "Corrupt",
+                    "cooldown": 0,
+                    "baseSigCharge": 0,
+                    "knockback": 0,
+                    "movesUser": null,
+                    "effects": [
+                        {
+                            "targetType": "Enemy",
+                            "targetMode": "Shape",
+                            "damage": 30,
+                            "healing": 0,
+                            "shielding": 0,
+                            "range": 5,
+                            "minRange": 1,
+                            "shape": "Single",
+                            "shapeSize": "0",
+                            "statusEffects": [],
+                            "instantEffects": [
+                                {
+                                    "type": "SigChargePercent",
+                                    "magnitude": -0.3,
+                                    "applyChance": 1.0
+                                },
+                                {
+                                    "type": "AddCooldown",
+                                    "magnitude": 2,
+                                    "applyChance": 1.0
+                                }
+                            ],
+                            "tileEffect": null
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "name": "Vas Drel",
+            "hp": 140,
+            "speed": 2,
+            "rarity": "C",
+            "sigChargeReq": 20,
+            "imageName": "Vas",
+            "affiliation": "Intergalactic Wizarding Organization",
+            "species": "Eronial",
+            "role": "Buffer",
+            "lore": [
+                "Vas Drel is a rune systems theorist within the IWO's Theoretical Division, known for his obsessive field research into arcane ward systems and pre-Breakpoint sigil architecture.",
+                "He carries several experimental wards designed to enhance allies' reflexes, accuracy, and healing responses."
+            ],
+            "moves": [
+                {
+                    "name": "Ward Resonance",
+                    "flavor": "",
+                    "mechanics": "At the start of Vas Drel's turn, if he is within 2 tiles of an ally, there is a 30% chance to grant Boost (45% critical damage bonus) to a random adjacent ally.",
+                    "type": "Passive",
+                    "essence": "None",
+                    "cooldown": 0,
+                    "baseSigCharge": 0,
+                    "knockback": 0,
+                    "movesUser": null,
+                    "effects": []
+                },
+                {
+                    "name": "Arcane Bolt",
+                    "flavor": "",
+                    "mechanics": "Deal 15 Arcane damage to a single enemy at range 5.",
+                    "type": "Normal",
+                    "essence": "Arcane",
+                    "cooldown": 0,
+                    "baseSigCharge": 0,
+                    "knockback": 0,
+                    "movesUser": null,
+                    "effects": [
+                        {
+                            "targetType": "Enemy",
+                            "targetMode": "Shape",
+                            "damage": 15,
+                            "healing": 0,
+                            "shielding": 0,
+                            "range": 5,
+                            "minRange": 1,
+                            "shape": "Single",
+                            "shapeSize": "0",
+                            "statusEffects": [],
+                            "tileEffect": null
+                        }
+                    ]
+                },
+                {
+                    "name": "Rune Field",
+                    "flavor": "",
+                    "mechanics": "Place Inspiration tiles on a size 1 cross centered at range 2 for 2 turns. Allies who end their turn on an Inspiration tile gain Inspired (20% damage multiplier) for 1 turn.",
+                    "type": "Skill",
+                    "essence": "Arcane",
+                    "cooldown": 2,
+                    "baseSigCharge": 20,
+                    "knockback": 0,
+                    "movesUser": null,
+                    "effects": [
+                        {
+                            "targetType": "Ground",
+                            "targetMode": "Shape",
+                            "damage": 0,
+                            "healing": 0,
+                            "shielding": 0,
+                            "range": 2,
+                            "minRange": 0,
+                            "shape": "Cross",
+                            "shapeSize": "1",
+                            "statusEffects": [],
+                            "tileEffect": {
+                                "name": "Inspiration",
+                                "triggerOn": "TurnEnd",
+                                "targetType": "Ally",
+                                "damage": 0,
+                                "healing": 0,
+                                "shielding": 0,
+                                "duration": 2,
+                                "applyChance": 1.0,
+                                "statusEffects": [
+                                    {
+                                        "name": "Inspired",
+                                        "type": "DamageMultiplier",
+                                        "magnitude": 0.2,
+                                        "duration": 1,
+                                        "isDebuff": false,
+                                        "applyChance": 1.0
+                                    }
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "Runic Surge",
+                    "flavor": "",
+                    "mechanics": "Target a single ally within range 3. Each of the following has a 50% chance to be applied for 2 turns: Boost (45% critical damage bonus), LockedIn (25% critical rate), Recover (20 HP healed per turn), Sight (20% accuracy bonus).",
+                    "type": "Signature",
+                    "essence": "Arcane",
+                    "cooldown": 0,
+                    "baseSigCharge": 0,
+                    "knockback": 0,
+                    "movesUser": null,
+                    "effects": [
+                        {
+                            "targetType": "Ally",
+                            "targetMode": "Shape",
+                            "damage": 0,
+                            "healing": 0,
+                            "shielding": 0,
+                            "range": 3,
+                            "minRange": 1,
+                            "shape": "Single",
+                            "shapeSize": "0",
+                            "statusEffects": [
+                                {
+                                    "name": "Boost",
+                                    "type": "CritDamageModifier",
+                                    "magnitude": 0.45,
+                                    "duration": 2,
+                                    "isDebuff": false,
+                                    "applyChance": 0.5
+                                },
+                                {
+                                    "name": "LockedIn",
+                                    "type": "CritRateModifier",
+                                    "magnitude": 0.25,
+                                    "duration": 2,
+                                    "isDebuff": false,
+                                    "applyChance": 0.5
+                                },
+                                {
+                                    "name": "Recover",
+                                    "type": "HealOverTime",
+                                    "magnitude": 20,
+                                    "duration": 2,
+                                    "isDebuff": false,
+                                    "applyChance": 0.5
+                                },
+                                {
+                                    "name": "Sight",
+                                    "type": "AccuracyModifier",
+                                    "magnitude": 0.2,
+                                    "duration": 2,
+                                    "isDebuff": false,
+                                    "applyChance": 0.5
+                                }
+                            ],
+                            "tileEffect": null
+                        }
+                    ]
+                }
+            ]
+        }
+    ]
+}

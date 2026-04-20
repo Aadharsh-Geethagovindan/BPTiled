@@ -1,0 +1,209 @@
+Fighters Moveset
+
+Arkhe - arkhe is character who moves swiftly and attacks quickly, but as a monk, his attacks happen in close range.
+
+Passive - For every 10 tiles of distance arkhe covers, he gains Flighted (+2 speed)
+Normal - 30 elemental damage, 3 range single target, knocksback 1 tiles
+Skill - Arkhe can swap positions with an ally in range. range 6
+Sig -  Arkhe can reposition an enemy within range to anywhere 3 tiles of their current location. The repositioned enemy also takes 60 damage. Range 4
+
+
+Avarice - big time healer, important for the team to protect, and for enemies to try and focus kill immediately
+
+Healer
+Passive - On death, a tile zone of 2 x 3 box centered on avarice gains Vitalized for 10 turns. Vitalized tiles provide 20 healing when an ally ends their turn on them. 
+Normal - 20 elemental damage, 5 range single target
+Skill - 50 Heal single target
+Sig  - Avarice blesses the ground in a 3x3 grid. Any ally characters finishing their turns in any tile that is blessed will recieve 30 healing and gain the Arise Condition for 3 turns. Blessed lasts 3 turns. Arise gives 30% crit rate, and cannot stack
+
+
+Bessil -  Bessil is a Tier 1 Apex Class rift entity that is a living nightmare. There are few accounts of its existence, due to how effective it is at kiling its targets. Playstyle wise,
+It acts from a distance and confuses and traps its enemies, driving them mad with fear.
+Long RangeAmbush DPS
+Passive - Bessil gains Tainted(50% corrupt res) for 5 turns. He is immune to the Stun and Rooted conditions
+Normal - Deals 40 Corrupt damage in a cross size 1.range is 6 
+Skill - Place a ring of shapesize 4 on the ground, and affected tiles gain DarkShadow. Any enemy who walks into the Darkshadow tile takes 20 corrupt damage. Damage increases by 10 for each debuff on the enemy. Range 4
+Sig -  Deals 80 corrupt damage to a single target, range of 20
+
+Breach Specialist - Silgarian spec ops unit whose goal is to contain small scale rift breaks. SMall scale rift breaks produce low level rift creatures, but lots of them, so they specialize in damage spread over a large distance
+Passive - For every 5 enemies hit, gain Focused (15% dmg mult)
+Normal - 2 x 1 box range 3 deal 15 elemental dmg
+Skill - Flamethrower in a cone shapesize 5, dealing 20 elemental damage. 
+Sig - 3x3 box aimed at the ground. All enemies within the box immediately recieve 30 damage.Affected Tiles gain Scorched for 2 turns. Walking through a scorched tile or ending your turn on a scorched tile deals 20 elemental damage. 
+
+Captain Dinso - Captain of a Constellian Army company. He carries a shield and is a stalwart defender and leader of men.
+Passive - at the start of his turn, any allies within 4 tiles of dinso gain Inspired for 1 turn.
+Normal - Deal 25 force damage range 3 to single target. 
+Skill - Shield bash: Deal damage in a cone size 3, origin caster. All affected enemies are knocked back three tiles. 
+Sig - Vanguard Assault - Dinso charges forward using movesUser, dealing force damage in a cross size 1 on arrival and knocking all hit enemies back 2 tiles. Gains a 40 point shield on cast. 
+
+Constellian Trooper - standard trooper in the Constellian Army. The Constellian Alliance is made of multiple start systems. Troopers are trained and professional
+Passive - For every 75 damage dealt, gain a permanent .2x dmg multiplication
+Normal - 3 range, 20 force damage 
+Skill -  5 range, 35 force dmg
+Sig - Carbine Overloaded - 2 range, shapesize 5 cone, 25 force damage
+
+Faru - Rifthunter from Thalnys. Rifthunters are genetically altered warriors trained from youth to combat rift-corrupted threats. Fights with a energy sword
+Passive - Rifthunter's Focus
+Faru gains a stacking Focused buff each time he receives a buff from any source, max 3 stacks. Each stack increases his damage by 15%.
+Normal - 40 force damage, range 1, single target. Consumes all Focused stacks — each stack adds 15 flat damage to this strike.
+Skill - Faru grants himself Sharpened for 2 turns — increases crit rate by 25%. If Faru already has any buffs active, also grants Evasive — increase dodge chance by 15%.
+Sig - 80 force damage to single target, range 1. Damage increased by 10 for each buff currently active on Faru.
+
+Huron -  A fighter of legend and rumored to be divine origin born shortly after the Divine rift wars 300 years ago, though he seems to be just reaching 20 or so maturity wise. He has many incredible feats of strength and speed, along with an ability to tap into innnate divine power
+Passive - Gains 10% crit damage for every 100hp lost
+Normal - Range 2 50 force damage 
+Skill - Solar Spray - Cross size 2, originating at caster (range 0) deals 25 arcane damage and has a 80% chance to apply Covered (20% acc down) for 2 turns
+Sig -  Super Huron Fist - Range 1, 150 arcane damage single target
+
+Jack - a prodigious talent who was accepted into a top Cindralith University, but after disagreements with the broken academic system, dropped out. 
+He gained notoreity by hacking into an expo and taking control of the drones on show and causing general havoc in the area using them. His focus should be sabotage and subtefuge
+Passive - When jack takes damage, his dodge percent goes up by 6%, capping at 24%
+Normal - 20 corrupt damage 4 range single target
+Skill - range 3, box 2x2, deals 20 corrupt damage applies Rooted for one turn (Speed down to 0).
+Skill - range 4, single target applies 35% accuracy down for 2 turns
+Sig - Single Target range 5, drains 30% sig charge, adds 2 turns to skill cooldown, deals 30 corrupt damage
+
+K.A.S - A robot designed by the large cindralith trust Halycon meant to replace human fighters on the frontlines of rift surges. Only a handful of succesful prototypes were made, before the project was scrapped for cost
+Classic DPS playstyle, meant to deal damage and take out enemies
+Passive - Every time K.A.S. uses it's Sig, increases it's crit dmg by 30%
+Normal - 30 arcane dmg, single target range 2
+Skill - 40 arcane damage Line size 4
+Sig -  Deals 100 arcane damage to a single enemy, and applies Narcana (-20% arcane res) for 3 turns.
+
+Krakoa - A battle crazed fighter who was teleported during a rift surge into the northern wastes of arkhalion prime with his father. Only he survived. He enlisted in Starsprawler academy, but was picked out pre-grad to be in a commando unit for the constellian Navy
+A brutish fighter who solo drops into heavily contested rift zones, he is a tank meant to kill his way through enemies
+Passive - Gains 10% corrupt res and 10% force res for every 100 hp lost
+Normal - 35 Force damage single target, range 3
+Skill -Deals 20 elemental damage and knocksback opponents 3 tiles. cone size 5, range caster
+Skill - Deals 25 elemental damage and pulls an enemy towards you , range 5
+Sig - Ring size 3 originating at caster, all enemies hit are knocked back 2 tiles and take 40 force damage. 
+
+Legionary - Bruiser Tank
+A veteran troop unit in the Silgar Military. Silgar are one of the three planets in the Arkhalion System, along with Aetherion and Cindralith. They boast the greatest Military of the three and a poroud history of it. 
+Legionaries are troops used to war, and fight as needed to win. they are also primarily a dps unit
+Passive - Legionary's attacks have a 25% chance to apply Winded (-15% force res) for 2 turns on hit.
+Normal - Deals 25 force damage, single target range 3
+Skill - Deals 30 force damage and has a 50% chance to apply Rupture (20 Force DoT) for 2 turns
+Sig -  Hold The Line
+Line size 4 caster origin. All enemies hit take 50 force damage and gain Shattered (-30% force res) for 2 turns. All allies in the line gain a 30 point shield.
+
+Mizca - A rift entity in Goliath Class. It is a large roaming beast with a scythe attached to one arm. While they are not particularly durable, Generally an experienced squad (8-12) or Strike Unit(25-30) of Constellian Troopers is required to take one down safely
+Passive - Gains a stack of rage everytime it crits. 
+Normal - Deals 36 corrupt damage to a single target, range 5 
+Skill - Sweep the scythe - Shape size 3 ring of 28 corrupt damage
+Skill - Boulder Toss - 3x2 box of 50 corrupt damage, range 4
+Sig - Piledriver - Line size 3, range 3. Deals 70 corrupt damage. Consumes Rage stacks. Damage increases by 15 per Rage Stack
+
+
+Nou
+Passive - Nou starts with 20% dodge 
+Normal - Cross of size 1, 30 elemental damage, range 3
+Skill - Deal 40 elemental damage at an enemy and inflict blinded for 1 turn. blinded is 50% acc down, range 3
+Sig - WorldWinds - 4x4 box on the ground. At cast time, any enemies within the area take 40 damage, and the tile gains the stormy affect. Any enemies of Nou within a stormy tile have 20% less accuracy. , range 2
+
+Olthar -
+Passive - Judicial Resolve - Once per game, when an ally dies, Olthar resets both skill cooldowns and gains Inscribed (30% arcane res) and Tempered (30% elemental res) for 4 turns.
+Normal - Deals 35 arcane damage, range 2
+Skill - Deals 30 damage to an enemy and applies Slowed(-2 speed) for 2 turns, range 2 single target
+Skill - applies JudgeWard on an ally, range 2. When an ally with JudgeWard takes damage, half of that damage is redirected to the source that applied that status effect.
+Sig - A 3x3 box of tiles,centered on caster is affected by Uprooted (-3 speed) for 3 turns
+
+Rover - A modified version of the assistant droid most single fighter troops in the Constellian Navy get
+Passive - At the start of rover's Turn, any allies within 2 tiles gain Sight (20% accuracy)
+Normal - Deals 10 force damage single target, range 2
+Skill - Radar - Cast in a size 5 cone. Enemies within the cone gain Spotted (-30% dodge) for 3 turns and Compromised (-3 speed)
+Skill - Resupply - Choose an ally within range 3 to gain Recover (20 HoT) for 2 turns
+Sig - Casts in a size 3 cone. Allies within the cone gain 50% sig charge, Energized (+2 speed) and Charged (30% damage multiplier).
+
+Raish - Raish are corrupted quadrupedal riftbeasts commonly encountered in low level riftbreaks. They are mutated beasts from Arkhalion prime. While not too aggressive on their own, they are dangerous in a pack. 
+Passive - Pack tactics -  At the start of it's turn, if the raish is within 2 tiles of an ally, it gains Howl for 1 turn. Howl increases dmg mult by 15%
+Normal - 25 corrupt damage single target, range 3
+Skill - Feral Lunge - Raish lunges at a single target, range 2, 35 corrupt damage. If Raish has Howl active, applies a bleed DoT (15 corrupt damage for 2 turns). Rewards being near allies before striking.
+Sig -Pack Call - All allies within 3 tiles gain Hunter immediately regardless of turn order. Hunter applies 15% crit rate increase. Raish deals 50 corrupt damage in a cross shapesize 1 originating at caster.
+
+Rei - A High level applied arcanist at the Intergalactic Wizarding Organization (IWO). She speciliaizes in magical weapons handling, and thus is as capable in combat as any IWO wizards in the combat division. 
+
+Passive - Rei is immune to arcane damage if it is 30 damage or less
+Normal - Deals 40 damage in a line size 2, range 2
+Skill - Deals 25 damage in a cone size 3, and has a 100% chance to apply Hex (15 Arcane DoT) for 3 turns, range 2
+Sig - 70 arcane damage in a line size 5. There is a 60% chance to apply Stun for 1 turn range 3
+
+Rellin
+Passive - for every 10% accuracy he has over 100%, he gains one stack of Sniper Focus (10% dmg mult) for 1 turn
+Normal - Deals 25 elemental damage to 1 enemy, range 7
+Skill - Deals 35 elemental damage to 1 enemy and applies Unsettled (-10% acc) for 2 turns, range 8
+Skill - Ready, Aim... - Rellin applies Steady (35% acc up) to himself for 2 turns 
+Sig - Deals 100 elemental damage to 1 enemy, range 8
+
+Sanguine - An assassin for the Silgar Military. She uses a wire whip, and hunts her enemies until they bleed out. DoT based dps
+Passive - When sanguine applies a DoT, there is a 15% chance for that DoT to be applied again to the target
+Normal - Deals 25 force damage to 1 enemy with a 10% chance to apply Cut(10 Corrupt DoT) for 1 turn, range 3
+Skill - Deal 30 corrupt damage in a cross size 1 originating at caster,  and apply Bleed (15 corrupt DoT) for 2 turns
+Sig -Deal 60 corrupt damage to a single enemy, range 3. All DoT stacks on the enemy trigger immediately during hit, without ticking the counter.
+
+Sedra - A powerful child born to two high ranking parents in Aetherion. She is blessed by the goddess Nou, and has shown potential for great power, once flying to a remote aetherion outpost who sent a distress call and clearing the rift outbreak there before the other forces made it
+Passive - Sedra is able to move after attacking, and halves terrain cost
+Normal - 40 arcane dmg single target, range 2
+Skill - Sedra dashes to a target tile and strikes in a cross size 1 on arrival. 30 arcane damage. movesUser carries her to the target location. Range 4.
+Sig - 80 arcane damage in a ring size 3, caster origin
+
+Skirvex
+Passive - Upon death, explode in a box size 3x3. Any enemies within range take 25 corrupt damage
+Normal - 15 corrupt damage, single target range 2
+Skill - applies a size 2 cross of Karrow to tiles for 3 turns. Any enemy that is not a riftbeast will take 10 corrupt damage if they end their turn on a Karrow tile. range caster origin
+Sig -  Applies a 3 x 3 caster origin box of Karrow to tiles, and all enemies within the tiles upon cast take 30 corrupt damage
+
+Temple Guard
+Passive -  All allies start the match with a 20 point shield
+Normal - 15 elemental damage single target range 2
+Skill - Applies Halo (20% arcane and energy res) for 2 turns and also has a 40% chance to apply Clarity(15% acc.) for 1 turn to 1 ally, range 2
+Skill - Apply a 20 point shield to ally's in ring size 2
+Sig - Apply Sanctuary to tiles in a 2x3 box for 2 turns. Ending on a sanctuary tile provides 20 shield, 30 healing and Empowered (20% dmg mult)
+
+
+Trex
+Passive - When T-Rex is the only surviving member of his team, gain 50% damage and full signature charge
+Normal - Deals 35 corrupt damage to 1 enemy, range 2
+Skill - Shield self for 30 points and gain Regenerative Hide (15 HoT) for 2 turns
+Sig - Deals 50 corrupt damage and apply Poisoned (20 corrupt DoT) for 2 turns, range 3
+
+Trustless Engineer
+Passive - At the start of the turn, there is a 30% chance to decrease skill cooldown by 2 and a 25% chance to gain 20% sig charge
+Normal - Deals 20 corrupt damage, range 5
+Skill - Grenade toss - Mark a cross of size 3 of tiles with Rigged. When an enemy moves to/through a rigged tile, it detonates and they take 25 damage
+Sig - Marks a ring of size 3 tiles with Trappings. On cast, any enemies in affected tiles take 30 damage. Enemies who move to/through trappings tiles have a 50% chance to trigger Rooted (speed 0) and lose a buff on them.
+
+Ulmika
+Passive - At the start of her turn, if an ally is within 2 tiles (including ulmika herself), Ulmika removes a debuff from them. The passive has a higher priority on allies than ulmika
+Normal - Deals 13 arcane damage to 1 enemy, range 2
+Skill - Grants up to 2 allies within range 25 shield points, range 2
+Sig - 3 x 3 box applied on tiles. If affected tiles have any effects placed on them by the enemy, they are removed. Affected tiles gain Supplied for 1 turn. Allies who end their turn on a supplied tile gain 20 shield, range caster origin
+
+Vas Drel
+Passive - If within 2 tiles of an ally at start of his turn, Vas has a 30% chance to grant Boost (45% crit dmg) to an ally (single)
+Normal - Deals 15 arcane damage to single target, range 5 
+Skill - Creates a cross size 1 tile effect Inspired (20% dmg mult), range 2
+Sig - 50% chance each to apply Boost(45% cr dmg), LockedIn(25% cr rate), Recover(20 HoT) and Sight (20% acc) to a Single Ally within range 3
+
+Vemk Parlas
+Passive - For every 3 debuffs vemk applies, he gains a 20 point shield
+Normal - Deal 15 corrupt damage in a ring size 2, range 3
+Skill - Select up to 2 enemies in range, apply Sabotaged (Crit rate -30%) and remove a buff per target, range 5
+Sig - Removes all buffs from the target and transfers them to a friendly ally of your choice within range 5.
+
+Virae
+Passive - At the start of her turn, virae and any ally within 1 tiles gains a 10 point shield
+Normal - Deals 12 elemental damage to 1 enemy, range 4
+Skill - Skill — Select a single ally within range 2, extend all active buffs on them by 1 turn and apply Glacial Bloom (20% elem res)
+Sig - Give all allies within a 2x2 box a 45 point shield. Range 2
+
+VyGar
+Passive - Has a 50% chance to gain Hunter(15% crit rate) for 2 turns.
+Normal - 35 force damage, range 3, single target. Knockback 1.
+Skill - 40 corrupt damage, range 1, single target. Applies Decaying (-20% dmg mult) for 2 turns
+Skill - An experimental Cindralith Trust prototype. 25 arcane damage in a line size 3, range 2.
+Sig -  60 force damage in a cross size 1 at caster origin, applies Shocked (-15% elemental res) for 2 turns to all hit enemies
+
+
+Legends of Kingdom RangeAmbushfire emblem 8, free houses

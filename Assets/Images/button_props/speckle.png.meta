@@ -1,0 +1,611 @@
+fileFormatVersion: 2
+guid: f70732ef6b6dd1b41992098e67e8e072
+TextureImporter:
+  internalIDToNameTable:
+  - first:
+      213: -39368115925698791
+    second: speckle_0
+  - first:
+      213: 7377516503219884648
+    second: speckle_1
+  - first:
+      213: 5640706358085729087
+    second: speckle_2
+  - first:
+      213: 3175415000627456586
+    second: speckle_3
+  - first:
+      213: 2521925586909774077
+    second: speckle_4
+  - first:
+      213: 2269128626765429990
+    second: speckle_5
+  - first:
+      213: -1040825580320675614
+    second: speckle_6
+  - first:
+      213: 3321069475554506308
+    second: speckle_7
+  - first:
+      213: -212987398452644717
+    second: speckle_8
+  - first:
+      213: -4161982962116994015
+    second: speckle_9
+  - first:
+      213: -4781448957344050894
+    second: speckle_10
+  - first:
+      213: 4614884354192782094
+    second: speckle_11
+  - first:
+      213: 4889472829527060461
+    second: speckle_12
+  - first:
+      213: 4857954297853727070
+    second: speckle_13
+  - first:
+      213: 4528610530502803557
+    second: speckle_14
+  - first:
+      213: 7312397630696650129
+    second: speckle_15
+  - first:
+      213: 1333438222700297083
+    second: speckle_16
+  - first:
+      213: -1988092441406831306
+    second: speckle_17
+  - first:
+      213: 4116781939520786723
+    second: speckle_18
+  externalObjects: {}
+  serializedVersion: 13
+  mipmaps:
+    mipMapMode: 0
+    enableMipMap: 0
+    sRGBTexture: 1
+    linearTexture: 0
+    fadeOut: 0
+    borderMipMap: 0
+    mipMapsPreserveCoverage: 0
+    alphaTestReferenceValue: 0.5
+    mipMapFadeDistanceStart: 1
+    mipMapFadeDistanceEnd: 3
+  bumpmap:
+    convertToNormalMap: 0
+    externalNormalMap: 0
+    heightScale: 0.25
+    normalMapFilter: 0
+    flipGreenChannel: 0
+  isReadable: 0
+  streamingMipmaps: 0
+  streamingMipmapsPriority: 0
+  vTOnly: 0
+  ignoreMipmapLimit: 0
+  grayScaleToAlpha: 0
+  generateCubemap: 6
+  cubemapConvolution: 0
+  seamlessCubemap: 0
+  textureFormat: 1
+  maxTextureSize: 2048
+  textureSettings:
+    serializedVersion: 2
+    filterMode: 1
+    aniso: 1
+    mipBias: 0
+    wrapU: 1
+    wrapV: 1
+    wrapW: 1
+  nPOTScale: 0
+  lightmap: 0
+  compressionQuality: 50
+  spriteMode: 1
+  spriteExtrude: 1
+  spriteMeshType: 1
+  alignment: 0
+  spritePivot: {x: 0.5, y: 0.5}
+  spritePixelsToUnits: 100
+  spriteBorder: {x: 0, y: 0, z: 0, w: 0}
+  spriteGenerateFallbackPhysicsShape: 1
+  alphaUsage: 1
+  alphaIsTransparency: 1
+  spriteTessellationDetail: -1
+  textureType: 8
+  textureShape: 1
+  singleChannelComponent: 0
+  flipbookRows: 1
+  flipbookColumns: 1
+  maxTextureSizeSet: 0
+  compressionQualitySet: 0
+  textureFormatSet: 0
+  ignorePngGamma: 0
+  applyGammaDecoding: 0
+  swizzle: 50462976
+  cookieLightType: 0
+  platformSettings:
+  - serializedVersion: 4
+    buildTarget: DefaultTexturePlatform
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: Standalone
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  spriteSheet:
+    serializedVersion: 2
+    sprites:
+    - serializedVersion: 2
+      name: speckle_0
+      rect:
+        serializedVersion: 2
+        x: 610
+        y: 954
+        width: 8
+        height: 8
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 917b5ca38e2247ff0800000000000000
+      internalID: -39368115925698791
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: speckle_1
+      rect:
+        serializedVersion: 2
+        x: 276
+        y: 890
+        width: 8
+        height: 9
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 862d0030c24326660800000000000000
+      internalID: 7377516503219884648
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: speckle_2
+      rect:
+        serializedVersion: 2
+        x: 679
+        y: 827
+        width: 7
+        height: 7
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: f3bbcf30c80d74e40800000000000000
+      internalID: 5640706358085729087
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: speckle_3
+      rect:
+        serializedVersion: 2
+        x: 639
+        y: 796
+        width: 10
+        height: 10
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: a4aa8d67e17511c20800000000000000
+      internalID: 3175415000627456586
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: speckle_4
+      rect:
+        serializedVersion: 2
+        x: 346
+        y: 740
+        width: 6
+        height: 6
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: df0c9b5a5fdaff220800000000000000
+      internalID: 2521925586909774077
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: speckle_5
+      rect:
+        serializedVersion: 2
+        x: 872
+        y: 727
+        width: 9
+        height: 9
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 6ecf504b6709d7f10800000000000000
+      internalID: 2269128626765429990
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: speckle_6
+      rect:
+        serializedVersion: 2
+        x: 122
+        y: 704
+        width: 9
+        height: 8
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 2e8a8d336ae3e81f0800000000000000
+      internalID: -1040825580320675614
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: speckle_7
+      rect:
+        serializedVersion: 2
+        x: 541
+        y: 676
+        width: 8
+        height: 8
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 446b1dc971fc61e20800000000000000
+      internalID: 3321069475554506308
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: speckle_8
+      rect:
+        serializedVersion: 2
+        x: 769
+        y: 585
+        width: 7
+        height: 8
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 394789de6115b0df0800000000000000
+      internalID: -212987398452644717
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: speckle_9
+      rect:
+        serializedVersion: 2
+        x: 369
+        y: 560
+        width: 11
+        height: 10
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 12cd9cd0c8aad36c0800000000000000
+      internalID: -4161982962116994015
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: speckle_10
+      rect:
+        serializedVersion: 2
+        x: 295
+        y: 494
+        width: 8
+        height: 8
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 23198d9a181e4adb0800000000000000
+      internalID: -4781448957344050894
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: speckle_11
+      rect:
+        serializedVersion: 2
+        x: 167
+        y: 469
+        width: 9
+        height: 8
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: e033b239edc5b0040800000000000000
+      internalID: 4614884354192782094
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: speckle_12
+      rect:
+        serializedVersion: 2
+        x: 409
+        y: 357
+        width: 7
+        height: 6
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: def62e602a5ead340800000000000000
+      internalID: 4889472829527060461
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: speckle_13
+      rect:
+        serializedVersion: 2
+        x: 852
+        y: 349
+        width: 7
+        height: 8
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: e5157a202bbea6340800000000000000
+      internalID: 4857954297853727070
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: speckle_14
+      rect:
+        serializedVersion: 2
+        x: 640
+        y: 327
+        width: 8
+        height: 10
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 56086bca84bd8de30800000000000000
+      internalID: 4528610530502803557
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: speckle_15
+      rect:
+        serializedVersion: 2
+        x: 305
+        y: 259
+        width: 11
+        height: 7
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 195f41207eada7560800000000000000
+      internalID: 7312397630696650129
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: speckle_16
+      rect:
+        serializedVersion: 2
+        x: 160
+        y: 198
+        width: 10
+        height: 11
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: b7bbaf9aff2518210800000000000000
+      internalID: 1333438222700297083
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: speckle_17
+      rect:
+        serializedVersion: 2
+        x: 719
+        y: 183
+        width: 10
+        height: 9
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 6358e493570e864e0800000000000000
+      internalID: -1988092441406831306
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: speckle_18
+      rect:
+        serializedVersion: 2
+        x: 432
+        y: 101
+        width: 9
+        height: 10
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 32151e2cc5fb12930800000000000000
+      internalID: 4116781939520786723
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    outline: []
+    customData: 
+    physicsShape: []
+    bones: []
+    spriteID: 5e97eb03825dee720800000000000000
+    internalID: 0
+    vertices: []
+    indices: 
+    edges: []
+    weights: []
+    secondaryTextures: []
+    spriteCustomMetadata:
+      entries: []
+    nameFileIdTable:
+      speckle_0: -39368115925698791
+      speckle_1: 7377516503219884648
+      speckle_10: -4781448957344050894
+      speckle_11: 4614884354192782094
+      speckle_12: 4889472829527060461
+      speckle_13: 4857954297853727070
+      speckle_14: 4528610530502803557
+      speckle_15: 7312397630696650129
+      speckle_16: 1333438222700297083
+      speckle_17: -1988092441406831306
+      speckle_18: 4116781939520786723
+      speckle_2: 5640706358085729087
+      speckle_3: 3175415000627456586
+      speckle_4: 2521925586909774077
+      speckle_5: 2269128626765429990
+      speckle_6: -1040825580320675614
+      speckle_7: 3321069475554506308
+      speckle_8: -212987398452644717
+      speckle_9: -4161982962116994015
+  mipmapLimitGroupName: 
+  pSDRemoveMatte: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
