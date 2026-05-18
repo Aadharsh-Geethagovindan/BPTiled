@@ -3995,10 +3995,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0cd44c1031e13a943bb63640046fad76, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_UiScaleMode: 0
+  m_UiScaleMode: 1
   m_ReferencePixelsPerUnit: 100
   m_ScaleFactor: 1
-  m_ReferenceResolution: {x: 800, y: 600}
+  m_ReferenceResolution: {x: 1920, y: 1080}
   m_ScreenMatchMode: 0
   m_MatchWidthOrHeight: 0
   m_PhysicalUnit: 3
@@ -8687,6 +8687,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   tilePrefab: {fileID: 1407151956330840923, guid: e414235c781e86f488dff91964368888, type: 3}
+  tileMaterial: {fileID: 0}
   mapData: {fileID: 11400000, guid: 77f7dedc7f10fab498543bd370fc02d0, type: 2}
   essenceOverlayOpacity: 0.45
   arcaneColor: {r: 0.8679245, g: 0.77850115, b: 0.045033824, a: 1}

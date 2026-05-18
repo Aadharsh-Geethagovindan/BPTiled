@@ -134,7 +134,8 @@ TextureImporter:
     secondaryTextures: []
     spriteCustomMetadata:
       entries: []
-    nameFileIdTable: {}
+    nameFileIdTable:
+      Krakoa_0: 399880560660732684
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

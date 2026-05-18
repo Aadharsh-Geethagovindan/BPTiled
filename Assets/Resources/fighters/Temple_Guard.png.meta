@@ -134,7 +134,8 @@ TextureImporter:
     secondaryTextures: []
     spriteCustomMetadata:
       entries: []
-    nameFileIdTable: {}
+    nameFileIdTable:
+      Temple_Guard_0: 8808650780217112902
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

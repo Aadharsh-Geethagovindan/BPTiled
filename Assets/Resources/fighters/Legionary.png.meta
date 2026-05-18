@@ -134,7 +134,8 @@ TextureImporter:
     secondaryTextures: []
     spriteCustomMetadata:
       entries: []
-    nameFileIdTable: {}
+    nameFileIdTable:
+      Legionary_0: -6182727334697701207
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

@@ -67,8 +67,7 @@ public class SelectionCard : MonoBehaviour
 
     private void OnClicked()
     {
-        _ui?.ShowPreview(_data);
-        CharSelectManager.Instance.TryPick(_data);
+        _ui?.SetPending(_data);
     }
 
     private Color RarityColor(string rarity) => rarity switch

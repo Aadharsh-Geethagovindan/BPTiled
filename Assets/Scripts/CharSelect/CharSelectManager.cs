@@ -1,49 +1,54 @@
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
-using UnityEngine.SceneManagement;
 
-// Owns all character select state: draft order, picks, restrictions, and scene transition.
 public class CharSelectManager : MonoBehaviour
 {
     public static CharSelectManager Instance { get; private set; }
 
     [Header("Scene refs")]
-    [SerializeField] private Board             board;
-    [SerializeField] private TerrainGenerator  terrainGenerator;
-    [SerializeField] private BoardRenderer     boardRenderer;
-    [SerializeField] private CameraController  cameraController;
+    [SerializeField] private Board            board;
+    [SerializeField] private TerrainGenerator terrainGenerator;
+    [SerializeField] private BoardRenderer    boardRenderer;
+    [SerializeField] private CameraController cameraController;
 
     [Header("Settings")]
-    [SerializeField] private string battleSceneName = "Battle";
+    [SerializeField] private string battleSceneName = "BattleScene";
     [SerializeField] private bool   restrictionsEnabled = true;
 
     [Header("UI")]
     [SerializeField] private CharSelectUI ui;
 
+    // ── Network state (set by CharSelectNetworkBridge) ─────────────────────
+
+    public static bool IsNetworked { get; set; } = false;
+    public static bool IsServer    { get; set; } = false;
+    public int LocalTeamIndex { get; set; } = -1;
+
     // ── Draft state ────────────────────────────────────────────────────────
 
     private const int TeamSize = 3;
 
-    // Index 0 = Team 1, Index 1 = Team 2
     private readonly List<FighterData>[] _picks = { new(), new() };
+    private int _firstPickTeamIndex;
+    private int _pickNumber;
 
-    // Pick order: 0 = Team 1 picks first, 1 = Team 2 picks first (randomized)
-    private int _firstPickTeamIndex;   // 0-based
-    private int _pickNumber;           // 0..5 (6 total picks)
+    public int  PickNumber         => _pickNumber;
+    public int  FirstPickTeamIndex => _firstPickTeamIndex;
 
     public bool RestrictionsEnabled
     {
         get => restrictionsEnabled;
-        set { restrictionsEnabled = value; OnRestrictionsToggled(); }
+        set { restrictionsEnabled = value; OnRestrictionsChanged?.Invoke(); ui?.RefreshAll(); }
     }
 
-    public int ActiveTeamIndex   => GetTeamIndexForPick(_pickNumber);
-    public bool DraftComplete    => _pickNumber >= TeamSize * 2;
+    public int  ActiveTeamIndex => GetTeamIndexForPick(_pickNumber);
+    public bool DraftComplete   => _pickNumber >= TeamSize * 2;
 
     // ── Events ─────────────────────────────────────────────────────────────
-    public static event System.Action<int, FighterData> OnPickMade;     // teamIndex, fighter
-    public static event System.Action<int>              OnPickTurnChanged; // teamIndex whose turn it is
+
+    public static event System.Action<int, FighterData> OnPickMade;
+    public static event System.Action<int>              OnPickTurnChanged;
     public static event System.Action                   OnDraftComplete;
     public static event System.Action                   OnRestrictionsChanged;
 
@@ -57,43 +62,55 @@ public class CharSelectManager : MonoBehaviour
 
     private void Start()
     {
-        GenerateMap();
-        StartDraft();
+        if (!IsNetworked)
+        {
+            LocalTeamIndex = -1;
+            GenerateMapWithSeed(Random.Range(1, int.MaxValue));
+            StartDraftInternal();
+        }
+        // Networked: CharSelectNetworkBridge.OnStartServer drives initialisation
     }
 
     // ── Map ────────────────────────────────────────────────────────────────
 
-    private void GenerateMap()
+    public void GenerateMapWithSeed(int seed)
     {
         board.Initialize();
         terrainGenerator.Initialize(board);
+        terrainGenerator.SetSeed(seed);
         terrainGenerator.Generate();
         boardRenderer.Initialize(board);
         cameraController.FitToBoard(board);
-
-        MatchSetup.MapSeed = terrainGenerator.LastSeed;
+        MatchSetup.MapSeed = seed;
     }
 
     // ── Draft ──────────────────────────────────────────────────────────────
 
-    private void StartDraft()
+    public void StartDraftInternal()
     {
-        _pickNumber        = 0;
+        _pickNumber         = 0;
         _firstPickTeamIndex = Random.Range(0, 2);
         _picks[0].Clear();
         _picks[1].Clear();
-
-        // Team that picks SECOND acts FIRST in battle
-        MatchSetup.FirstActingTeam = (_firstPickTeamIndex == 0) ? 2 : 1;
-
+        MatchSetup.FirstActingTeam = _firstPickTeamIndex == 0 ? 2 : 1;
         OnPickTurnChanged?.Invoke(ActiveTeamIndex);
         ui?.RefreshAll();
     }
 
-    /// Called when a player clicks a character card.
     public void TryPick(FighterData fighter)
     {
+        if (IsNetworked && !IsServer)
+            CharSelectNetworkBridge.Instance?.CmdTryPick(fighter.name);
+        else
+            ProcessPick(fighter.name);
+    }
+
+    public void ProcessPick(string fighterName)
+    {
         if (DraftComplete) return;
+
+        var roster = FighterLoader.LoadRoster();
+        if (!roster.TryGetValue(fighterName, out var fighter)) return;
         if (IsAlreadyPicked(fighter)) return;
 
         int teamIdx = ActiveTeamIndex;
@@ -105,9 +122,9 @@ public class CharSelectManager : MonoBehaviour
         }
 
         _picks[teamIdx].Add(fighter);
-        OnPickMade?.Invoke(teamIdx, fighter);
-
         _pickNumber++;
+
+        OnPickMade?.Invoke(teamIdx, fighter);
 
         if (DraftComplete)
         {
@@ -122,18 +139,60 @@ public class CharSelectManager : MonoBehaviour
         ui?.RefreshAll();
     }
 
-    /// Remove the last pick for a team (undo).
-    public void UndoLastPick(int teamIndex)
+    // Called on clients to apply a pick broadcast from the server
+    public void ApplyPickFromNetwork(int teamIdx, string fighterName, int newPickNumber,
+                                     bool draftComplete, string[] t1, string[] t2, int firstActing)
     {
-        if (_picks[teamIndex].Count == 0) return;
+        var roster = FighterLoader.LoadRoster();
+        if (!roster.TryGetValue(fighterName, out var fighter)) return;
 
-        // Only allow undo if it was this team's most recent pick
-        int lastPickTeam = GetTeamIndexForPick(_pickNumber - 1);
-        if (lastPickTeam != teamIndex) return;
+        _picks[teamIdx].Add(fighter);
+        _pickNumber = newPickNumber;
 
-        _picks[teamIndex].RemoveAt(_picks[teamIndex].Count - 1);
-        _pickNumber--;
+        OnPickMade?.Invoke(teamIdx, fighter);
 
+        if (draftComplete)
+        {
+            MatchSetup.Team1Fighters   = t1;
+            MatchSetup.Team2Fighters   = t2;
+            MatchSetup.FirstActingTeam = firstActing;
+            OnDraftComplete?.Invoke();
+        }
+        else
+        {
+            OnPickTurnChanged?.Invoke(ActiveTeamIndex);
+        }
+
+        ui?.RefreshAll();
+    }
+
+    public void ResetDraft()
+    {
+        if (IsNetworked && !IsServer)
+            CharSelectNetworkBridge.Instance?.CmdResetDraft();
+        else
+            ProcessReset();
+    }
+
+    public void ProcessReset()
+    {
+        _pickNumber         = 0;
+        _firstPickTeamIndex = Random.Range(0, 2);
+        _picks[0].Clear();
+        _picks[1].Clear();
+        MatchSetup.FirstActingTeam = _firstPickTeamIndex == 0 ? 2 : 1;
+        OnPickTurnChanged?.Invoke(ActiveTeamIndex);
+        ui?.RefreshAll();
+    }
+
+    // Called on clients to apply a reset broadcast from the server
+    public void ApplyResetFromNetwork(int firstPickTeamIndex)
+    {
+        _pickNumber         = 0;
+        _firstPickTeamIndex = firstPickTeamIndex;
+        _picks[0].Clear();
+        _picks[1].Clear();
+        MatchSetup.FirstActingTeam = firstPickTeamIndex == 0 ? 2 : 1;
         OnPickTurnChanged?.Invoke(ActiveTeamIndex);
         ui?.RefreshAll();
     }
@@ -147,25 +206,17 @@ public class CharSelectManager : MonoBehaviour
     public bool IsPickAllowed(int teamIndex, FighterData fighter)
     {
         var currentRarities = _picks[teamIndex].Select(f => f.rarity).ToList();
-
-        // Check if any pattern still works after adding this pick
         currentRarities.Add(fighter.rarity);
         if (currentRarities.Count == TeamSize)
             return RestrictionEngine.IsValidTeam(currentRarities);
-
-        // Mid-draft: check that at least one valid completion still exists
         var allowedRanks = RestrictionEngine.AllowedNextRanks(
             _picks[teamIndex].Select(f => f.rarity).ToList());
         return allowedRanks.Contains(RestrictionEngine.GetRank(fighter.rarity));
     }
 
-    /// Returns the set of rarity ranks the active team can still legally pick.
-    /// Used by UI to grey out cards.
     public HashSet<int> GetAllowedRanksForActiveTeam()
     {
-        if (!restrictionsEnabled)
-            return new HashSet<int> { 0, 1, 2, 3, 4 };
-
+        if (!restrictionsEnabled) return new HashSet<int> { 0, 1, 2, 3, 4 };
         return RestrictionEngine.AllowedNextRanks(
             _picks[ActiveTeamIndex].Select(f => f.rarity).ToList());
     }
@@ -178,15 +229,18 @@ public class CharSelectManager : MonoBehaviour
     {
         if (!MatchSetup.IsReady)
         {
-            Debug.LogWarning("[CharSelect] Draft not complete — cannot start battle.");
+            Debug.LogWarning("[CharSelect] Draft not complete.");
             return;
         }
-        SceneManager.LoadScene(battleSceneName);
+
+        if (IsNetworked)
+            CharSelectNetworkBridge.Instance?.ServerStartBattle();
+        else
+            UnityEngine.SceneManagement.SceneManager.LoadScene(battleSceneName);
     }
 
     // ── Helpers ────────────────────────────────────────────────────────────
 
-    // Alternating pick order starting from _firstPickTeamIndex
     private int GetTeamIndexForPick(int pickNum)
         => (_firstPickTeamIndex + pickNum) % 2;
 
@@ -194,11 +248,5 @@ public class CharSelectManager : MonoBehaviour
     {
         MatchSetup.Team1Fighters = _picks[0].Select(f => f.name).ToArray();
         MatchSetup.Team2Fighters = _picks[1].Select(f => f.name).ToArray();
-    }
-
-    private void OnRestrictionsToggled()
-    {
-        OnRestrictionsChanged?.Invoke();
-        ui?.RefreshAll();
     }
 }

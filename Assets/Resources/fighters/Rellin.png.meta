@@ -134,7 +134,8 @@ TextureImporter:
     secondaryTextures: []
     spriteCustomMetadata:
       entries: []
-    nameFileIdTable: {}
+    nameFileIdTable:
+      Rellin_0: 3657004469313802136
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 
