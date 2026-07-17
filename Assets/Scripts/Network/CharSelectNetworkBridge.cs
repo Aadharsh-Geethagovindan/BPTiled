@@ -12,17 +12,18 @@ public class CharSelectNetworkBridge : NetworkBehaviour
     [Header("Settings")]
     [SerializeField] private string battleSceneName = "BattleScene";
 
-    private void OnEnable()  { Instance = this; }
-    private void OnDisable() { if (Instance == this) Instance = null; }
+    private void Awake()     { Instance = this; }
+    private void OnDestroy() { if (Instance == this) Instance = null; }
 
     // ── FishNet callbacks ──────────────────────────────────────────────────
 
     public override void OnStartServer()
     {
         base.OnStartServer();
+        //Debug.Log("[Bridge] OnStartServer fired");
 
-        CharSelectManager.IsNetworked = true;
-        CharSelectManager.IsServer    = true;
+        CharSelectManager.IsServer = true;
+        MatchSetup.LocalTeamId = 1; // host controls Team 1
 
         var mgr = CharSelectManager.Instance;
         if (mgr == null) { Debug.LogError("[Bridge] CharSelectManager not found"); return; }
@@ -33,13 +34,12 @@ public class CharSelectNetworkBridge : NetworkBehaviour
         mgr.GenerateMapWithSeed(seed);
         mgr.StartDraftInternal();
 
-        // Push map seed and initial draft state to clients
         RpcGenerateMap(seed);
         RpcSyncReset(mgr.FirstPickTeamIndex);
 
-        // Subscribe to manager events to know when to broadcast
         CharSelectManager.OnPickMade      += OnServerPickMade;
         CharSelectManager.OnDraftComplete += OnServerDraftComplete;
+        //Debug.Log("[Bridge] OnStartServer complete — subscribed to OnPickMade");
     }
 
     public override void OnStopServer()
@@ -47,31 +47,37 @@ public class CharSelectNetworkBridge : NetworkBehaviour
         base.OnStopServer();
         CharSelectManager.OnPickMade      -= OnServerPickMade;
         CharSelectManager.OnDraftComplete -= OnServerDraftComplete;
-        CharSelectManager.IsNetworked = false;
-        CharSelectManager.IsServer    = false;
+        CharSelectManager.IsServer = false;
     }
 
     public override void OnStartClient()
     {
         base.OnStartClient();
-        CharSelectManager.IsNetworked = true;
 
         if (!IsServerStarted)
         {
             CharSelectManager.IsServer = false;
-            if (CharSelectManager.Instance != null)
-                CharSelectManager.Instance.LocalTeamIndex = 1;
+            MatchSetup.LocalTeamId = 2; // client controls Team 2
+            StartCoroutine(SetLocalTeamIndexWhenReady());
 
-            // Request current state from server — RpcGenerateMap may have fired before we were ready
             CmdRequestState();
         }
+    }
+
+    // CharSelectManager.Instance can still be null the instant this NetworkObject spawns on the
+    // client (Awake order between scene objects isn't guaranteed). Leaving LocalTeamIndex stuck
+    // at its -1 default is worse than a null check skipping the assignment — CharSelectUI treats
+    // -1 as "always my turn" (the hotseat convention), which lets the client confirm picks out
+    // of turn until something else happens to re-trigger this. Retry until it's actually set.
+    private System.Collections.IEnumerator SetLocalTeamIndexWhenReady()
+    {
+        yield return new WaitUntil(() => CharSelectManager.Instance != null);
+        CharSelectManager.Instance.LocalTeamIndex = 1;
     }
 
     public override void OnStopClient()
     {
         base.OnStopClient();
-        if (!IsServerStarted)
-            CharSelectManager.IsNetworked = false;
     }
 
     // ── Server RPCs (client → server) ─────────────────────────────────────
@@ -87,14 +93,32 @@ public class CharSelectNetworkBridge : NetworkBehaviour
     [TargetRpc]
     private void TargetRpcReceiveState(NetworkConnection conn, int mapSeed, int firstPickTeamIndex)
     {
-        CharSelectManager.Instance?.GenerateMapWithSeed(mapSeed);
-        CharSelectManager.Instance?.ApplyResetFromNetwork(firstPickTeamIndex);
+        Debug.Log($"[Bridge] TargetRpcReceiveState — seed={mapSeed} CSM={CharSelectManager.Instance != null}");
+        StartCoroutine(ApplyStateWhenReady(mapSeed, firstPickTeamIndex));
+    }
+
+    private System.Collections.IEnumerator ApplyStateWhenReady(int mapSeed, int firstPickTeamIndex)
+    {
+        yield return new WaitUntil(() => CharSelectManager.Instance != null);
+        Debug.Log($"[Bridge] ApplyStateWhenReady — applying seed={mapSeed}");
+        CharSelectManager.Instance.GenerateMapWithSeed(mapSeed);
+        CharSelectManager.Instance.ApplyResetFromNetwork(firstPickTeamIndex);
     }
 
     [ServerRpc(RequireOwnership = false)]
     public void CmdTryPick(string fighterName)
     {
-        CharSelectManager.Instance?.ProcessPick(fighterName);
+        var mgr = CharSelectManager.Instance;
+        if (mgr == null) return;
+
+        // Host always picks via the local ProcessPick() path (see CharSelectManager.TryPick), so
+        // any CmdTryPick that reaches the server came from the sole remote client — team index 1.
+        // Reject it if it isn't actually that team's turn (client-side gating in CharSelectUI is
+        // cosmetic only and shouldn't be trusted, especially while LocalTeamIndex is still
+        // settling right after connecting).
+        if (mgr.ActiveTeamIndex != 1) return;
+
+        mgr.ProcessPick(fighterName);
     }
 
     [ServerRpc(RequireOwnership = false)]
@@ -110,6 +134,7 @@ public class CharSelectNetworkBridge : NetworkBehaviour
 
     private void OnServerPickMade(int teamIdx, FighterData fighter)
     {
+        //Debug.Log($"[Bridge] OnServerPickMade — team={teamIdx} fighter={fighter?.name}");
         var mgr = CharSelectManager.Instance;
         if (mgr == null) return;
 
@@ -118,6 +143,7 @@ public class CharSelectNetworkBridge : NetworkBehaviour
                     done ? MatchSetup.Team1Fighters : null,
                     done ? MatchSetup.Team2Fighters : null,
                     done ? MatchSetup.FirstActingTeam : 0);
+        //Debug.Log("[Bridge] RpcPickMade sent");
     }
 
     private void OnServerDraftComplete()
@@ -143,6 +169,7 @@ public class CharSelectNetworkBridge : NetworkBehaviour
     private void RpcPickMade(int teamIdx, string fighterName, int newPickNumber,
                              bool draftComplete, string[] t1, string[] t2, int firstActing)
     {
+        //Debug.Log($"[Bridge] RpcPickMade received on client — team={teamIdx} fighter={fighterName}");
         CharSelectManager.Instance?.ApplyPickFromNetwork(
             teamIdx, fighterName, newPickNumber, draftComplete, t1, t2, firstActing);
     }

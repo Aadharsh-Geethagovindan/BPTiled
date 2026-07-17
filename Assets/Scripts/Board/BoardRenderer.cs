@@ -39,6 +39,9 @@ public class BoardRenderer : MonoBehaviour
 
     private void RenderBoard()
     {
+        for (int i = transform.childCount - 1; i >= 0; i--)
+            Destroy(transform.GetChild(i).gameObject);
+
         for (int x = 0; x < _board.Width; x++)
         {
             for (int y = 0; y < _board.Height; y++)

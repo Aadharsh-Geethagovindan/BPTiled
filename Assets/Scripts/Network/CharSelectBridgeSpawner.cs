@@ -10,6 +10,7 @@ public class CharSelectBridgeSpawner : MonoBehaviour
     private void Start()
     {
         if (!InstanceFinder.IsServerStarted) return;
+        if (bridgePrefab == null) { Debug.LogError("[BridgeSpawner] bridgePrefab not assigned!"); return; }
         var obj = Instantiate(bridgePrefab);
         InstanceFinder.ServerManager.Spawn(obj);
     }

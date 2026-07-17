@@ -98,7 +98,7 @@ public class TerrainGenerator : MonoBehaviour
         Dominant2Type = availableTypes[1];
         MinorType = availableTypes[2];
 
-        Debug.Log($"[TerrainGenerator] Dominant1: {Dominant1Type} | Dominant2: {Dominant2Type} | Minor: {MinorType}");
+        Debug.Log($"[TerrainGenerator] seed={seed} board={_board.Width}x{_board.Height} | D1={Dominant1Type} D2={Dominant2Type} Minor={MinorType}");
 
         // Pre-calculate all origins before placing any tiles
         int topMinY = _board.Height / 2;
@@ -121,10 +121,11 @@ public class TerrainGenerator : MonoBehaviour
         Vector2Int minorOrigin = GetOriginInRegion(
             1, _board.Width - 2, centerMinY, centerMaxY);
 
-        // Store for external use
         Dominant1AnchorOrigin = d1Anchor;
         Dominant2AnchorOrigin = d2Anchor;
         MinorZoneOrigin = minorOrigin;
+
+        Debug.Log($"[TerrainGenerator] d1Anchor={d1Anchor} d2Anchor={d2Anchor} minorOrigin={minorOrigin}");
 
         // Place anchor zones first
         PlaceContiguousZone(Dominant1Type, _rng.Next(dominantAnchorMin, dominantAnchorMax + 1), d1Anchor); //NEW - place before satellite origin calc

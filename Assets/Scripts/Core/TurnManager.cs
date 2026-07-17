@@ -181,4 +181,30 @@ public class TurnManager : MonoBehaviour
                 return true;
         return false;
     }
+
+    // ── Network apply methods — client-side state sync, no logic re-run ──────
+
+    public void NetworkApplyActivation(Fighter fighter)
+    {
+        ActiveFighter = fighter;
+        OnFighterActivated?.Invoke(fighter);
+    }
+
+    public void NetworkApplyTurnEnded(Fighter fighter, int nextTeamId)
+    {
+        var ended = fighter;
+        ActiveFighter = null;
+        ActiveTeamId  = nextTeamId;
+        OnFighterTurnEnded?.Invoke(ended);
+        OnActivationChanged?.Invoke(ActiveTeamId);
+    }
+
+    public void NetworkApplyRoundStarted(int roundNumber, int firstTeamId)
+    {
+        RoundNumber  = roundNumber;
+        ActiveTeamId = firstTeamId;
+        ActiveFighter = null;
+        OnRoundStarted?.Invoke(roundNumber);
+        OnActivationChanged?.Invoke(firstTeamId);
+    }
 }

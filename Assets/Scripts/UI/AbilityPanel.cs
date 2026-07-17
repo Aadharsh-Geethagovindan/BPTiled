@@ -24,6 +24,7 @@ public class AbilityPanel : MonoBehaviour
 
     private Fighter _currentFighter;
     private Ability _displayedAbility;
+    private bool    _isPreviewOnly;
 
     private static readonly string IconPath = "effecticons/";
 
@@ -44,6 +45,7 @@ public class AbilityPanel : MonoBehaviour
 
     private void Awake()
     {
+        SelectionManager.OnFighterPreviewed   += OnFighterPreviewed;
         SelectionManager.OnFighterSelected    += OnFighterSelected;
         SelectionManager.OnFighterDeselected  += OnFighterDeselected;
         SelectionManager.OnAbilitySelected    += OnAbilitySelected;
@@ -66,6 +68,7 @@ public class AbilityPanel : MonoBehaviour
 
     private void OnDestroy()
     {
+        SelectionManager.OnFighterPreviewed   -= OnFighterPreviewed;
         SelectionManager.OnFighterSelected    -= OnFighterSelected;
         SelectionManager.OnFighterDeselected  -= OnFighterDeselected;
         SelectionManager.OnAbilitySelected    -= OnAbilitySelected;
@@ -75,14 +78,23 @@ public class AbilityPanel : MonoBehaviour
 
     // ── SelectionManager event handlers ────────────────────────────────────
 
+    private void OnFighterPreviewed(Fighter fighter)
+    {
+        _isPreviewOnly  = true;
+        PopulateFighter(fighter);
+    }
+
     private void OnFighterSelected(Fighter fighter)
     {
-        _currentFighter = fighter;
+        _isPreviewOnly  = false;
+        PopulateFighter(fighter);
+    }
 
+    private void PopulateFighter(Fighter fighter)
+    {
+        _currentFighter = fighter;
         RefreshSlotButtons();
         SetTargetingMode(false);
-
-        // Auto-display Normal on selection; fall back to first available
         var first = GetAbilityInSlot(AbilitySlot.Normal) ?? GetFirstAbility();
         if (first != null) DisplayAbility(first);
         else ClearDisplay();
@@ -90,6 +102,7 @@ public class AbilityPanel : MonoBehaviour
 
     private void OnFighterDeselected()
     {
+        _isPreviewOnly    = false;
         _currentFighter   = null;
         _displayedAbility = null;
         ClearDisplay();
@@ -148,7 +161,7 @@ public class AbilityPanel : MonoBehaviour
     // Disable USE if the sig is selected but the fighter doesn't have enough charge.
     private void RefreshUseButton()
     {
-        if (_displayedAbility == null || _currentFighter == null)
+        if (_displayedAbility == null || _currentFighter == null || _isPreviewOnly)
         {
             useButton.interactable = false;
             return;

@@ -17,6 +17,7 @@ public class FighterInfoPanel : MonoBehaviour
     [Header("Movement")]
     [SerializeField] private TextMeshProUGUI moveText;
     [SerializeField] private Button          moveButton;
+    [SerializeField] private Button          activateButton;
 
     [Header("Stats")]
     [SerializeField] private TextMeshProUGUI crValue;
@@ -37,6 +38,7 @@ public class FighterInfoPanel : MonoBehaviour
 
     private void Awake()
     {
+        SelectionManager.OnFighterPreviewed  += ShowPreview;
         SelectionManager.OnFighterSelected   += Show;
         SelectionManager.OnFighterDeselected += Hide;
         SelectionManager.OnMovePointsChanged += UpdateMoveText;
@@ -45,13 +47,17 @@ public class FighterInfoPanel : MonoBehaviour
         Fighter.OnChargeChanged              += HandleChargeChanged;
         Fighter.OnStatusEffectsChanged       += HandleStatusEffectsChanged;
         Fighter.OnFighterDied                += HandleFighterDied;
+        TurnManager.OnActivationChanged      += HandleActivationChanged;
 
         if (moveButton != null)
             moveButton.onClick.AddListener(() => SelectionManager.Instance.EnterMoveMode());
+        if (activateButton != null)
+            activateButton.onClick.AddListener(() => SelectionManager.Instance.ActivatePreviewedFighter());
     }
 
     private void OnDestroy()
     {
+        SelectionManager.OnFighterPreviewed  -= ShowPreview;
         SelectionManager.OnFighterSelected   -= Show;
         SelectionManager.OnFighterDeselected -= Hide;
         SelectionManager.OnMovePointsChanged -= UpdateMoveText;
@@ -60,9 +66,31 @@ public class FighterInfoPanel : MonoBehaviour
         Fighter.OnChargeChanged              -= HandleChargeChanged;
         Fighter.OnStatusEffectsChanged       -= HandleStatusEffectsChanged;
         Fighter.OnFighterDied                -= HandleFighterDied;
+        TurnManager.OnActivationChanged      -= HandleActivationChanged;
     }
 
     // ── Show / Hide ────────────────────────────────────────────────────────
+
+    // Preview: stats visible, but Activate and Move buttons reflect preview-only state
+    private void ShowPreview(Fighter fighter)
+    {
+        Show(fighter);
+        if (moveButton    != null) moveButton.interactable    = false;
+        RefreshActivateButton();
+    }
+
+    private void RefreshActivateButton()
+    {
+        if (activateButton == null) return;
+        bool canActivate = _displayedFighter != null
+            && SelectionManager.Instance != null
+            && SelectionManager.Instance.CurrentState == SelectionState.FighterPreviewed
+            && TurnManager.Instance != null
+            && TurnManager.Instance.CanActivate(_displayedFighter);
+        activateButton.interactable = canActivate;
+    }
+
+    private void HandleActivationChanged(int _) => RefreshActivateButton();
 
     private void Show(Fighter fighter)
     {
@@ -89,6 +117,7 @@ public class FighterInfoPanel : MonoBehaviour
 
         UpdateMoveText(fighter.RemainingMovePoints, fighter.Speed);
         if (moveButton != null) moveButton.interactable = fighter.RemainingMovePoints > 0f;
+        RefreshActivateButton();
 
         PopulateStats(fighter);
         PopulateResistances(fighter);
@@ -100,9 +129,10 @@ public class FighterInfoPanel : MonoBehaviour
         nameText.text     = string.Empty;
         SetHP(0, 0);
         SetCharge(0, 0);
-        if (portrait   != null) portrait.sprite = null;
-        if (moveText   != null) moveText.text   = string.Empty;
-        if (moveButton != null) moveButton.interactable = false;
+        if (portrait        != null) portrait.sprite = null;
+        if (moveText        != null) moveText.text   = string.Empty;
+        if (moveButton      != null) moveButton.interactable      = false;
+        if (activateButton  != null) activateButton.interactable  = false;
 
         ClearStats();
         ClearResistances();

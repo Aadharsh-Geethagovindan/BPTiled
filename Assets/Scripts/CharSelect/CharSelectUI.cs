@@ -54,15 +54,9 @@ public class CharSelectUI : MonoBehaviour
 
     public void SetPending(FighterData fighter)
     {
-        Debug.Log($"[CharSelectUI] SetPending — CSM.Instance={CharSelectManager.Instance != null} fighter={fighter?.name}");
         if (_draftComplete) return;
         _pendingPick = fighter;
-
-        int local  = CharSelectManager.Instance.LocalTeamIndex;
-        int active = CharSelectManager.Instance.ActiveTeamIndex;
-        bool isMyTurn = local == -1 || local == active; // -1 = hotseat, both teams local
-
-        confirmButton.interactable = fighter != null && isMyTurn;
+        RefreshConfirmState();
         previewPanel?.Show(fighter);
     }
 
@@ -109,9 +103,11 @@ public class CharSelectUI : MonoBehaviour
 
     private void HandlePickMade(int teamIndex, FighterData fighter)
     {
+        _pendingPick = null;
         team1PicksPanel?.Refresh();
         team2PicksPanel?.Refresh();
         gridPanel?.Refresh();
+        RefreshConfirmState();
     }
 
     private void HandlePickTurnChanged(int teamIndex)
@@ -119,6 +115,16 @@ public class CharSelectUI : MonoBehaviour
         gridPanel?.Refresh();
         team1PicksPanel?.Refresh();
         team2PicksPanel?.Refresh();
+        RefreshConfirmState();
+    }
+
+    private void RefreshConfirmState()
+    {
+        if (_draftComplete) return;
+        int local    = CharSelectManager.Instance.LocalTeamIndex;
+        int active   = CharSelectManager.Instance.ActiveTeamIndex;
+        bool isMyTurn = local == -1 || local == active;
+        confirmButton.interactable = _pendingPick != null && isMyTurn;
     }
 
     private void HandleDraftComplete()

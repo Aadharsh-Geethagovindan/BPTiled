@@ -1,6 +1,5 @@
 using Cysharp.Threading.Tasks;
 using System.Collections.Generic;
-using FishNet.Object;
 using UnityEngine;
 
 public enum BattleState
@@ -17,7 +16,7 @@ public enum BattleState
     GameOver
 }
 
-public class BattleController : NetworkBehaviour
+public class BattleController : MonoBehaviour
 {
     public static BattleController Instance { get; private set; }
 
@@ -40,13 +39,14 @@ public class BattleController : NetworkBehaviour
 
     private void Awake()
     {
-        if (Instance != null && Instance != this)
-        {
-            Destroy(gameObject);
-            return;
-        }
+        if (Instance != null && Instance != this) { Destroy(gameObject); return; }
         Instance = this;
-        
+    }
+
+    public Board GetBoard() => board;
+
+    private void Start()
+    {
         InitializeBoard();
     }
 
@@ -115,8 +115,19 @@ public class BattleController : NetworkBehaviour
         if (fighter.IsDead) return;
         if (fighter.RemainingMovePoints <= 0f) return;
 
+        if (MatchSetup.Mode == GameMode.Online && !BattleNetworkBridge.IsServer)
+        {
+            BattleNetworkBridge.Instance?.CmdRequestMove(fighter.FighterName, destination);
+            return;
+        }
+
         if (MoveResolver.ExecuteMove(fighter, destination, board))
-            fighter.SetMoved(true); // marks HasMovedThisTurn for auto-end-turn logic
+        {
+            fighter.SetMoved(true);
+            if (MatchSetup.Mode == GameMode.Online)
+                BattleNetworkBridge.Instance?.BroadcastFighterMoved(
+                    fighter.FighterName, fighter.GridPosition, fighter.RemainingMovePoints);
+        }
     }
 
     public void RequestUseAbility(Fighter fighter, Ability ability, Vector2Int anchor, List<Vector2Int> shapeTiles)
@@ -127,10 +138,15 @@ public class BattleController : NetworkBehaviour
         if (ability.IsOnCooldown) return;
         if (ability.Slot == AbilitySlot.Sig && fighter.CurrentCharge < fighter.SigChargeReq) return;
 
+        if (MatchSetup.Mode == GameMode.Online && !BattleNetworkBridge.IsServer)
+        {
+            BattleNetworkBridge.Instance?.CmdRequestAbility(
+                fighter.FighterName, ability.Name, anchor, shapeTiles.ToArray());
+            return;
+        }
+
         AbilityResolver.Execute(fighter, ability, shapeTiles, board);
 
-        // Teleport caster to anchor after ability resolves (e.g. Vanguard Assault)
-        // Skip if swap handled movement already
         if (ability.MovesUser && !ability.SwapWithTarget)
             MoveResolver.ExecuteReposition(fighter, anchor, board);
 
@@ -142,8 +158,13 @@ public class BattleController : NetworkBehaviour
 
         fighter.SetActed(true);
 
-        // Defer turn-end if SelectionManager still needs a second click (reposition phase).
-        // RequestReposition will call EndFighterTurn once the destination is chosen.
+        if (MatchSetup.Mode == GameMode.Online)
+        {
+            BattleNetworkBridge.Instance?.BroadcastAllFighterStates();
+            if (ability.BaseCooldown > 0)
+                BattleNetworkBridge.Instance?.BroadcastAbilityCooldown(fighter, ability);
+        }
+
         bool repositionPending = ability.RepositionRange > 0;
         if (!repositionPending && (!fighter.CanMoveAfterAction || fighter.HasMovedThisTurn))
             turnManager.EndFighterTurn();
@@ -151,7 +172,17 @@ public class BattleController : NetworkBehaviour
 
     public void RequestReposition(Fighter fighter, Vector2Int destination)
     {
+        if (MatchSetup.Mode == GameMode.Online && !BattleNetworkBridge.IsServer)
+        {
+            BattleNetworkBridge.Instance?.CmdRequestReposition(fighter.FighterName, destination);
+            return;
+        }
+
         MoveResolver.ExecuteReposition(fighter, destination, board);
+
+        if (MatchSetup.Mode == GameMode.Online)
+            BattleNetworkBridge.Instance?.BroadcastFighterMoved(
+                fighter.FighterName, fighter.GridPosition, fighter.RemainingMovePoints);
 
         if (!fighter.CanMoveAfterAction || fighter.HasMovedThisTurn)
             turnManager.EndFighterTurn();
@@ -160,12 +191,18 @@ public class BattleController : NetworkBehaviour
     public void RequestEndTurn()
     {
         if (turnManager.ActiveFighter == null) return;
+
+        if (MatchSetup.Mode == GameMode.Online && !BattleNetworkBridge.IsServer)
+        {
+            BattleNetworkBridge.Instance?.CmdRequestEndTurn();
+            return;
+        }
+
         turnManager.EndFighterTurn();
     }
 
-    // ── [SERVER] Battle flow ────────────────────────────────────────────────
+    // ── [SERVER] Battle flow stubs — will become ServerRpcs in Phase 3 ────────
 
-    [Server]
     public async UniTaskVoid StartBattle()
     {
         await TransitionTo(BattleState.BoardSetup);
@@ -177,7 +214,6 @@ public class BattleController : NetworkBehaviour
         await RunMatchLoop();
     }
 
-    [Server]
     private async UniTask RunMatchLoop()
     {
         while (!IsGameOver())
@@ -205,7 +241,6 @@ public class BattleController : NetworkBehaviour
         await RunGameOver();
     }
 
-    [Server]
     private async UniTask RunBoardSetup()
     {
         board.Initialize();
@@ -214,16 +249,15 @@ public class BattleController : NetworkBehaviour
         await UniTask.CompletedTask;
     }
 
-    [Server] private async UniTask RunDraft() { await UniTask.CompletedTask; }
-    [Server] private async UniTask RunRoundStart() { await UniTask.CompletedTask; }
-    [Server] private async UniTask RunActivationSelect() { await UniTask.CompletedTask; }
-    [Server] private async UniTask RunMovementPhase() { await UniTask.CompletedTask; }
-    [Server] private async UniTask RunActionPhase() { await UniTask.CompletedTask; }
-    [Server] private async UniTask RunResolutionPhase() { await UniTask.CompletedTask; }
-    [Server] private async UniTask RunRoundEnd() { await UniTask.CompletedTask; }
-    [Server] private async UniTask RunGameOver() { await UniTask.CompletedTask; }
+    private async UniTask RunDraft() { await UniTask.CompletedTask; }
+    private async UniTask RunRoundStart() { await UniTask.CompletedTask; }
+    private async UniTask RunActivationSelect() { await UniTask.CompletedTask; }
+    private async UniTask RunMovementPhase() { await UniTask.CompletedTask; }
+    private async UniTask RunActionPhase() { await UniTask.CompletedTask; }
+    private async UniTask RunResolutionPhase() { await UniTask.CompletedTask; }
+    private async UniTask RunRoundEnd() { await UniTask.CompletedTask; }
+    private async UniTask RunGameOver() { await UniTask.CompletedTask; }
 
-    [Server]
     private async UniTask TransitionTo(BattleState newState)
     {
         _currentState = newState;
@@ -231,7 +265,6 @@ public class BattleController : NetworkBehaviour
         await UniTask.CompletedTask;
     }
 
-    [Server]
     private bool IsGameOver()
     {
         return false;

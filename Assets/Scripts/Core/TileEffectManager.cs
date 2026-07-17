@@ -20,6 +20,15 @@ public class TileEffectManager : MonoBehaviour
 
     public void Initialize()
     {
+        // Same reasoning as PassiveManager: this mutates Fighter state directly in reaction to
+        // events that also fire on pure clients as local mirrors of server state. Only the
+        // authoritative peer (hotseat, or the online server) should actually run it.
+        // NOTE: this means tile effects are not currently visible to a pure client at all
+        // (nothing broadcasts placements to observers yet) — GetEffectsAt/HasEffects will read
+        // empty on that peer until a proper sync RPC is added.
+        if (MatchSetup.Mode == GameMode.Online && !FishNet.InstanceFinder.IsServerStarted)
+            return;
+
         TurnManager.OnFighterActivated += OnTurnStart;
         TurnManager.OnFighterTurnEnded += OnTurnEnd;
         TurnManager.OnRoundEnded       += OnRoundEnded;

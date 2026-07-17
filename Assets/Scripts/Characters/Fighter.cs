@@ -408,6 +408,42 @@ public class Fighter : MonoBehaviour
         ResetTurnState();
     }
 
+    // ── Network apply methods — client-side state sync, no game logic re-run ──
+
+    public void NetworkApplyHP(int value)
+    {
+        if (IsDead) return;
+        CurrentHP = Mathf.Clamp(value, 0, MaxHP);
+        OnHPChanged?.Invoke(this);
+        if (CurrentHP <= 0)
+        {
+            IsDead = true;
+            gameObject.SetActive(false);
+            OnFighterDied?.Invoke(this);
+        }
+    }
+
+    public void NetworkApplyCharge(int value)
+    {
+        CurrentCharge = Mathf.Clamp(value, 0, SigChargeReq);
+        OnChargeChanged?.Invoke(this);
+    }
+
+    public void NetworkApplyPosition(Vector2Int newPos, Board board)
+    {
+        if (IsDead || newPos == GridPosition) return;
+        var fromTile = board.GetTile(GridPosition);
+        if (fromTile != null) fromTile.OccupyingCharacter = null;
+        SetGridPosition(newPos);
+        var toTile = board.GetTile(newPos);
+        if (toTile != null) toTile.OccupyingCharacter = gameObject;
+    }
+
+    public void NetworkApplyRemainingMovePoints(float value)
+    {
+        RemainingMovePoints = Mathf.Max(0f, value);
+    }
+
     public void AddAbility(Ability ability) => _abilities.Add(ability);
 
     public void SetSprite(Sprite sprite)

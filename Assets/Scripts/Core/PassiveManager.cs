@@ -28,6 +28,14 @@ public class PassiveManager : MonoBehaviour
         _fighterManager = fighterManager;
         _board          = board;
 
+        // Passive logic mutates Fighter state directly and is not synced via RPC — it must run
+        // exactly once per action, on whichever peer is authoritative. In online mode a pure
+        // client would otherwise re-run this same logic locally every time it mirrors a server
+        // event (e.g. NetworkApplyActivation), producing duplicate log lines and independently
+        // rolled RNG that can diverge from the server's result.
+        if (MatchSetup.Mode == GameMode.Online && !FishNet.InstanceFinder.IsServerStarted)
+            return;
+
         Fighter.OnFighterDamaged       += OnFighterDamaged;
         Fighter.OnFighterDied          += OnFighterDied;
         Fighter.OnStatusEffectApplied  += OnStatusEffectApplied;

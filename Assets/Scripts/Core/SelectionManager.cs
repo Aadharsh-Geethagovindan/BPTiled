@@ -8,6 +8,7 @@ using UnityEngine;
 public enum SelectionState
 {
     Idle,
+    FighterPreviewed,    // clicked to inspect — info shown, no actions committed yet
     FighterSelected,
     Targeting,
     RepositionTargeting  // second click required to place a hit fighter somewhere
@@ -25,7 +26,8 @@ public class SelectionManager : MonoBehaviour
     public bool InMoveMode { get; private set; }
 
     // ── Events (UI subscribes to these) ────────────────────────────────────
-    public static event Action<Fighter> OnFighterSelected;
+    public static event Action<Fighter> OnFighterPreviewed;  // click to inspect (no activation)
+    public static event Action<Fighter> OnFighterSelected;   // fighter activated for their turn
     public static event Action          OnFighterDeselected;
     public static event Action<Ability> OnAbilitySelected;
     public static event Action          OnTargetingCancelled;
@@ -46,6 +48,7 @@ public class SelectionManager : MonoBehaviour
     public static event Action<float, float> OnMovePointsChanged;
 
     // ── Private refs ───────────────────────────────────────────────────────
+    private Fighter          _previewedFighter;
     private Board            _board;
     private TileHighlighter  _tileHighlighter;
     private Pathfinder       _pathfinder;
@@ -101,10 +104,11 @@ public class SelectionManager : MonoBehaviour
         switch (CurrentState)
         {
             case SelectionState.Idle:
+            case SelectionState.FighterPreviewed:
             {
                 var idleTile = _board.GetTile(pos);
                 if (idleTile?.OccupyingCharacter != null)
-                    TrySelectFighter(pos);
+                    TryPreviewFighter(pos);
                 else if (idleTile != null)
                     OnTileSelected?.Invoke(pos);
                 break;
@@ -116,19 +120,13 @@ public class SelectionManager : MonoBehaviour
 
                 if (InMoveMode && _moveRangeTiles.Contains(pos) && !isOccupied)
                 {
-                    // Valid move destination
                     TryMove(pos);
                 }
-                else if (isOccupied)
+                else if (!InMoveMode && tile != null && !isOccupied)
                 {
-                    // Clicking a fighter tile — try to switch or cancel selection
-                    TrySelectFighter(pos);
-                }
-                else if (!InMoveMode && tile != null)
-                {
-                    // Empty tile click outside move mode — show tile info
                     OnTileSelected?.Invoke(pos);
                 }
+                // Clicking any fighter while one is active does nothing — you're committed
                 break;
 
             case SelectionState.Targeting:
@@ -184,54 +182,84 @@ public class SelectionManager : MonoBehaviour
 
     // ── Fighter selection ──────────────────────────────────────────────────
 
-    private void TrySelectFighter(Vector2Int pos)
+    private void TryPreviewFighter(Vector2Int pos)
     {
         var tile = _board.GetTile(pos);
-        if (tile == null || tile.OccupyingCharacter == null) return; // ignore empty tile clicks
+        if (tile == null || tile.OccupyingCharacter == null) return;
 
         var fighter = tile.OccupyingCharacter.GetComponent<Fighter>();
         if (fighter == null || fighter.IsDead) return;
 
-        // Clicking the already-selected fighter — do nothing
-        if (fighter == SelectedFighter) return;
+        // Online: only allow previewing your own team's fighters
+        if (MatchSetup.LocalTeamId != 0 && fighter.TeamId != MatchSetup.LocalTeamId) return;
 
-        // Allow re-selecting the currently active fighter (handles accidental deselect)
-        if (fighter == TurnManager.Instance.ActiveFighter)
-        {
-            SelectedFighter = fighter;
-            SelectedAbility = null;
-            CurrentState    = SelectionState.FighterSelected;
-            ExitMoveMode();
-            OnFighterSelected?.Invoke(fighter);
-            return;
-        }
+        // Already previewing this fighter — do nothing
+        if (fighter == _previewedFighter) return;
 
-        // Only eligible fighters on the active team can be newly activated
-        if (!TurnManager.Instance.CanActivate(fighter)) return;
-
-        SelectedFighter = fighter;
-        SelectedAbility = null;
-        CurrentState    = SelectionState.FighterSelected;
-
+        _previewedFighter = fighter;
+        CurrentState      = SelectionState.FighterPreviewed;
         ExitMoveMode();
         _tileHighlighter.ClearRange();
         _tileHighlighter.ClearShape();
 
-        TurnManager.Instance.ActivateFighter(fighter);
-
-        // DoT may have killed the fighter during activation — don't show a dead fighter's panel
-        if (fighter.IsDead) return;
-
-        Debug.Log($"[SelectionManager] Selected fighter: {fighter.FighterName}");
         OnTileDeselected?.Invoke();
+        OnFighterPreviewed?.Invoke(fighter);
+    }
+
+    // Called by the Activate button in FighterInfoPanel — commits the previewed fighter for their turn.
+    public void ActivatePreviewedFighter()
+    {
+        if (_previewedFighter == null) return;
+        if (!TurnManager.Instance.CanActivate(_previewedFighter)) return;
+
+        // Online client: send to server and wait for RpcFighterActivated to come back
+        if (MatchSetup.Mode == GameMode.Online && !BattleNetworkBridge.IsServer)
+        {
+            BattleNetworkBridge.Instance?.CmdActivateFighter(_previewedFighter.FighterName);
+            return;
+        }
+
+        SelectedFighter   = _previewedFighter;
+        SelectedAbility   = null;
+        CurrentState      = SelectionState.FighterSelected;
+
+        TurnManager.Instance.ActivateFighter(SelectedFighter);
+
+        if (SelectedFighter.IsDead) return;
+
+        Debug.Log($"[SelectionManager] Activated fighter: {SelectedFighter.FighterName}");
+        OnFighterSelected?.Invoke(SelectedFighter);
+    }
+
+    // Called by BattleNetworkBridge when the server confirms activation of one of our fighters.
+    public void NetworkApplyActivation(Fighter fighter)
+    {
+        _previewedFighter = fighter;
+        SelectedFighter   = fighter;
+        SelectedAbility   = null;
+        CurrentState      = SelectionState.FighterSelected;
         OnFighterSelected?.Invoke(fighter);
+    }
+
+    public void FireMovePointsChanged(float remaining, float max)
+        => OnMovePointsChanged?.Invoke(remaining, max);
+
+    public void RefreshMoveRange()
+    {
+        if (!InMoveMode || SelectedFighter == null) return;
+        var reachable = _pathfinder.GetReachableTiles(SelectedFighter.GridPosition, SelectedFighter.RemainingMovePoints);
+        _moveRangeTiles = new HashSet<Vector2Int>(reachable.Keys);
+        _tileHighlighter.ClearMoveRange();
+        _tileHighlighter.ClearMoveHover();
+        _tileHighlighter.ShowMoveRange(_moveRangeTiles);
     }
 
     public void Deselect()
     {
-        SelectedFighter = null;
-        SelectedAbility = null;
-        CurrentState    = SelectionState.Idle;
+        SelectedFighter   = null;
+        SelectedAbility   = null;
+        _previewedFighter = null;
+        CurrentState      = SelectionState.Idle;
         _areaBiasLeft   = true;
         _lastHoveredPos = new Vector2Int(-1, -1);
 

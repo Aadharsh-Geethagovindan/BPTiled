@@ -109,4 +109,9 @@ public class FighterManager : MonoBehaviour
     {
         return _allFighters.FindAll(f => f.TeamId == teamId);
     }
+
+    public Fighter GetFighterByName(string name)
+    {
+        return _allFighters.Find(f => f.FighterName == name);
+    }
 }

@@ -19,9 +19,9 @@ public class CharSelectManager : MonoBehaviour
     [Header("UI")]
     [SerializeField] private CharSelectUI ui;
 
-    // ── Network state (set by CharSelectNetworkBridge) ─────────────────────
+    // ── Network state ──────────────────────────────────────────────────────
 
-    public static bool IsNetworked { get; set; } = false;
+    public static bool IsNetworked => MatchSetup.Mode == GameMode.Online;
     public static bool IsServer    { get; set; } = false;
     public int LocalTeamIndex { get; set; } = -1;
 
@@ -63,18 +63,22 @@ public class CharSelectManager : MonoBehaviour
     private void Start()
     {
         if (!IsNetworked)
-        {
-            LocalTeamIndex = -1;
-            GenerateMapWithSeed(Random.Range(1, int.MaxValue));
-            StartDraftInternal();
-        }
-        // Networked: CharSelectNetworkBridge.OnStartServer drives initialisation
+            InitHotseat();
+    }
+
+    public void InitHotseat()
+    {
+        LocalTeamIndex = -1;
+        MatchSetup.LocalTeamId = 0;
+        GenerateMapWithSeed(Random.Range(1, int.MaxValue));
+        StartDraftInternal();
     }
 
     // ── Map ────────────────────────────────────────────────────────────────
 
     public void GenerateMapWithSeed(int seed)
     {
+        Debug.Log($"[CSM] GenerateMapWithSeed({seed}) — board={board != null} terrain={terrainGenerator != null} renderer={boardRenderer != null} camera={cameraController != null}");
         board.Initialize();
         terrainGenerator.Initialize(board);
         terrainGenerator.SetSeed(seed);
@@ -124,17 +128,15 @@ public class CharSelectManager : MonoBehaviour
         _picks[teamIdx].Add(fighter);
         _pickNumber++;
 
+        if (DraftComplete)
+            CommitToMatchSetup();
+
         OnPickMade?.Invoke(teamIdx, fighter);
 
         if (DraftComplete)
-        {
-            CommitToMatchSetup();
             OnDraftComplete?.Invoke();
-        }
         else
-        {
             OnPickTurnChanged?.Invoke(ActiveTeamIndex);
-        }
 
         ui?.RefreshAll();
     }
