@@ -5,14 +5,14 @@ using System.Collections.Generic;
 // Pass to AbilityResolver.Apply to commit the changes.
 public class HitResult
 {
-    public readonly Fighter Caster;
-    public readonly Fighter Target;
-    public readonly Ability Ability;
+    public readonly Fighter       Caster;
+    public readonly Fighter       Target;
+    public readonly AbilityEffect Effect; // which of the ability's effects produced this result
 
     public readonly bool IsHit;
     public readonly bool IsCrit;
 
-    public readonly int FinalDamage;    // 0 if miss or ability has no damage
+    public readonly int FinalDamage;    // 0 if miss or effect has no damage
     public readonly int FinalHealing;   // heals always land
     public readonly int FinalShielding; // shields always land
 
@@ -22,7 +22,7 @@ public class HitResult
     // Instant effects that passed their applyChance roll — ready to commit in Apply().
     public readonly IReadOnlyList<AbilityInstantEffect> InstantEffectsToApply;
 
-    public HitResult(Fighter caster, Fighter target, Ability ability,
+    public HitResult(Fighter caster, Fighter target, AbilityEffect effect,
                      bool isHit, bool isCrit,
                      int finalDamage, int finalHealing, int finalShielding,
                      List<StatusEffect> statusEffectsToApply,
@@ -30,7 +30,7 @@ public class HitResult
     {
         Caster                = caster;
         Target                = target;
-        Ability               = ability;
+        Effect                = effect;
         IsHit                 = isHit;
         IsCrit                = isCrit;
         FinalDamage           = finalDamage;

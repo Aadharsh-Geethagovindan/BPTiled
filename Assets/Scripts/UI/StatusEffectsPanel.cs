@@ -13,6 +13,7 @@ public class StatusEffectsPanel : MonoBehaviour
 
     private void Awake()
     {
+        SelectionManager.OnFighterPreviewed  += OnFighterSelected;
         SelectionManager.OnFighterSelected   += OnFighterSelected;
         SelectionManager.OnFighterDeselected += OnFighterDeselected;
         Fighter.OnStatusEffectsChanged       += OnStatusEffectsChanged;
@@ -20,6 +21,7 @@ public class StatusEffectsPanel : MonoBehaviour
 
     private void OnDestroy()
     {
+        SelectionManager.OnFighterPreviewed  -= OnFighterSelected;
         SelectionManager.OnFighterSelected   -= OnFighterSelected;
         SelectionManager.OnFighterDeselected -= OnFighterDeselected;
         Fighter.OnStatusEffectsChanged       -= OnStatusEffectsChanged;
@@ -27,6 +29,8 @@ public class StatusEffectsPanel : MonoBehaviour
 
     // ── Event handlers ─────────────────────────────────────────────────────
 
+    // Shared by both preview (click to inspect) and select (activate) — status effects should
+    // be visible either way, not just once a fighter is the active one.
     private void OnFighterSelected(Fighter fighter)
     {
         _displayedFighter = fighter;

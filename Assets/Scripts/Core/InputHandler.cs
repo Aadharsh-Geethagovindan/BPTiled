@@ -6,6 +6,7 @@ public class InputHandler : MonoBehaviour
     // Subscribe to these from anywhere — no direct reference needed
     public static event Action<Vector2Int> OnTileHovered;
     public static event Action<Vector2Int> OnTileClicked;
+    public static event Action<Vector2Int> OnTileRightClicked; // used to deselect a multi-select pick
     public static event Action             OnBoardExited;
 
     [SerializeField] private Board  board;
@@ -51,6 +52,12 @@ public class InputHandler : MonoBehaviour
             {
                 Debug.Log($"[InputHandler] Firing OnTileClicked: {gridPos}");
                 OnTileClicked?.Invoke(gridPos);
+            }
+
+            if (Input.GetMouseButtonDown(1))
+            {
+                Debug.Log($"[InputHandler] Firing OnTileRightClicked: {gridPos}");
+                OnTileRightClicked?.Invoke(gridPos);
             }
         }
         else if (_wasOnBoard)

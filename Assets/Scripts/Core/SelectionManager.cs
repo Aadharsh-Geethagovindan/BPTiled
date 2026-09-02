@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using Cysharp.Threading.Tasks;
 using UnityEngine;
 
 // [CLIENT] SelectionManager owns input routing and selection state only.
@@ -11,7 +12,11 @@ public enum SelectionState
     FighterPreviewed,    // clicked to inspect — info shown, no actions committed yet
     FighterSelected,
     Targeting,
-    RepositionTargeting  // second click required to place a hit fighter somewhere
+    RepositionTargeting, // second click required to place a hit fighter somewhere
+    SecondaryTargeting,  // second click required for an ability's own follow-up target
+                         // (e.g. Vemk Parlas's Sig — pick which ally receives the transferred buffs)
+    MultiTargeting       // repeated clicks, one fighter at a time, until MaxTargets is reached or
+                         // the player re-confirms early — see AbilityEffect.MaxTargets
 }
 
 public class SelectionManager : MonoBehaviour
@@ -60,6 +65,16 @@ public class SelectionManager : MonoBehaviour
     // TODO: add a visible UI indicator so players know B toggles box bias
     private bool _areaBiasLeft = true;
 
+    // Explicit facing override for Line/Cone/Box — cycled with R key during targeting. Null means
+    // "not yet overridden, use the auto-inferred (anchor - caster) direction" (today's behavior).
+    // Necessary because a range-0 effect only ever has one valid anchor (the caster's own tile),
+    // so auto-inference has nothing to read a direction from and silently defaults to Up — R lets
+    // the player pick a real facing regardless of range.
+    // TODO: add a visible UI indicator so players know R rotates facing.
+    private static readonly Vector2Int[] FacingDirections =
+        { Vector2Int.up, Vector2Int.right, Vector2Int.down, Vector2Int.left };
+    private Vector2Int? _facingOverride = null;
+
     // Cache the last hovered position so B-key toggling refreshes the preview in place
     private Vector2Int       _lastHoveredPos      = new Vector2Int(-1, -1);
     private List<Vector2Int> _currentShapePreview = new List<Vector2Int>();
@@ -68,6 +83,19 @@ public class SelectionManager : MonoBehaviour
     private Fighter              _repositionTarget;
     private int                  _repositionRange;
     private HashSet<Vector2Int>  _repositionTiles = new HashSet<Vector2Int>();
+
+    // Secondary targeting state — the ability whose SecondaryEffect is awaiting its own target.
+    // SelectedFighter/SelectedAbility are already cleared by the time this phase starts (mirrors
+    // how RepositionTargeting stashes its own state separately), so this is what the second click
+    // resolves against.
+    private Ability _secondaryAbility;
+
+    // Multi-select targeting state — picks accumulated so far this phase. Which ability/effect
+    // they resolve against is SelectedAbility.PrimaryEffect or _secondaryAbility.SecondaryEffect
+    // depending on _multiSelectIsSecondary (mirrors how MultiTargeting can be entered from either
+    // the primary click phase or the secondary one — see EnterMultiTargeting).
+    private readonly List<Vector2Int> _multiSelectPicks = new List<Vector2Int>();
+    private bool _multiSelectIsSecondary;
 
     // ── Lifecycle ──────────────────────────────────────────────────────────
 
@@ -83,24 +111,31 @@ public class SelectionManager : MonoBehaviour
         _tileHighlighter = tileHighlighter;
         _pathfinder      = new Pathfinder(board);
 
-        InputHandler.OnTileClicked     += HandleTileClicked;
-        InputHandler.OnTileHovered     += HandleTileHovered;
-        TurnManager.OnFighterTurnEnded += HandleFighterTurnEnded;
+        InputHandler.OnTileClicked      += HandleTileClicked;
+        InputHandler.OnTileRightClicked += HandleTileRightClicked;
+        InputHandler.OnTileHovered      += HandleTileHovered;
+        TurnManager.OnFighterTurnEnded  += HandleFighterTurnEnded;
 
         Debug.Log("[SelectionManager] Initialized");
     }
 
     private void OnDestroy()
     {
-        InputHandler.OnTileClicked     -= HandleTileClicked;
-        InputHandler.OnTileHovered     -= HandleTileHovered;
-        TurnManager.OnFighterTurnEnded -= HandleFighterTurnEnded;
+        InputHandler.OnTileClicked      -= HandleTileClicked;
+        InputHandler.OnTileRightClicked -= HandleTileRightClicked;
+        InputHandler.OnTileHovered      -= HandleTileHovered;
+        TurnManager.OnFighterTurnEnded  -= HandleFighterTurnEnded;
     }
 
     // ── Input routing ──────────────────────────────────────────────────────
 
     private void HandleTileClicked(Vector2Int pos)
     {
+        // Block all input while the selected fighter is mid-stepped-move (see Fighter.IsMoving) —
+        // covers local host/hotseat (RequestMove is still awaiting) and a remote client (state
+        // syncs keep IsMoving true until the server's loop finishes), same flag either way.
+        if (SelectedFighter != null && SelectedFighter.IsMoving) return;
+
         switch (CurrentState)
         {
             case SelectionState.Idle:
@@ -120,7 +155,7 @@ public class SelectionManager : MonoBehaviour
 
                 if (InMoveMode && _moveRangeTiles.Contains(pos) && !isOccupied)
                 {
-                    TryMove(pos);
+                    TryMove(pos).Forget();
                 }
                 else if (!InMoveMode && tile != null && !isOccupied)
                 {
@@ -136,27 +171,74 @@ public class SelectionManager : MonoBehaviour
             case SelectionState.RepositionTargeting:
                 TryConfirmReposition(pos);
                 break;
+
+            case SelectionState.SecondaryTargeting:
+                TryConfirmSecondaryTarget(pos);
+                break;
+
+            case SelectionState.MultiTargeting:
+                TryPickMultiTarget(pos);
+                break;
         }
     }
 
+    // Right-click only ever means "un-pick this tile" and only means anything mid multi-select —
+    // everywhere else it's a no-op, unlike left-click which routes through the full state machine.
+    private void HandleTileRightClicked(Vector2Int pos)
+    {
+        if (CurrentState != SelectionState.MultiTargeting) return;
+        if (!_multiSelectPicks.Remove(pos)) return;
+
+        _tileHighlighter.ShowMultiSelect(_multiSelectPicks);
+        Debug.Log($"[SelectionManager] Multi-select pick removed at {pos} ({_multiSelectPicks.Count} remaining)");
+    }
+
+    // The effect currently driving targeting — PrimaryEffect during the first click,
+    // SecondaryEffect during the follow-up phase. Null outside of targeting entirely.
+    private AbilityEffect CurrentTargetingEffect => CurrentState switch
+    {
+        SelectionState.Targeting          => SelectedAbility?.PrimaryEffect,
+        SelectionState.SecondaryTargeting => _secondaryAbility?.SecondaryEffect,
+        SelectionState.MultiTargeting     => _multiSelectIsSecondary ? _secondaryAbility?.SecondaryEffect : SelectedAbility?.PrimaryEffect,
+        _                                 => null
+    };
+
     private void Update()
     {
-        if (CurrentState == SelectionState.Targeting
-            && SelectedAbility?.Shape == AbilityShape.Box
-            && Input.GetKeyDown(KeyCode.B))
+        var effect = CurrentTargetingEffect;
+
+        if ((effect?.Shape == AbilityShape.Box || effect?.Shape == AbilityShape.Ring) && Input.GetKeyDown(KeyCode.B))
         {
             _areaBiasLeft = !_areaBiasLeft;
             if (_lastHoveredPos.x >= 0)
-                UpdateShapePreview(_lastHoveredPos);
+                UpdateShapePreview(_lastHoveredPos, effect);
+        }
+
+        // A Line is a fixed beam, not manually rotatable — except at range 0, where it's the ONLY
+        // way to pick a direction at all (only one valid anchor: the caster's own tile, so hover
+        // can't communicate a facing either). Cone/Box stay rotatable at any range.
+        bool rotatable = effect != null &&
+            (effect.Shape == AbilityShape.Cone || effect.Shape == AbilityShape.Box ||
+             (effect.Shape == AbilityShape.Line && effect.Range == 0));
+        if (rotatable && Input.GetKeyDown(KeyCode.R))
+        {
+            int currentIndex = _facingOverride.HasValue ? Array.IndexOf(FacingDirections, _facingOverride.Value) : 0;
+            _facingOverride = FacingDirections[(currentIndex + 1) % FacingDirections.Length];
+            if (_lastHoveredPos.x >= 0)
+                UpdateShapePreview(_lastHoveredPos, effect);
         }
     }
 
     private void HandleTileHovered(Vector2Int pos)
     {
-        if (CurrentState == SelectionState.Targeting)
+        if (CurrentState == SelectionState.Targeting || CurrentState == SelectionState.SecondaryTargeting ||
+            CurrentState == SelectionState.MultiTargeting)
         {
+            // MultiTargeting's effect is always Shape==Single (see EnterMultiTargeting's gate),
+            // so GetShapeTiles just returns [pos] — this shows the same anchor indicator normal
+            // targeting does, previewing which tile you're about to add to the pick list.
             _lastHoveredPos = pos;
-            UpdateShapePreview(pos);
+            UpdateShapePreview(pos, CurrentTargetingEffect);
         }
         else if (CurrentState == SelectionState.RepositionTargeting)
         {
@@ -247,7 +329,7 @@ public class SelectionManager : MonoBehaviour
     public void RefreshMoveRange()
     {
         if (!InMoveMode || SelectedFighter == null) return;
-        var reachable = _pathfinder.GetReachableTiles(SelectedFighter.GridPosition, SelectedFighter.RemainingMovePoints);
+        var reachable = _pathfinder.GetReachableTiles(SelectedFighter.GridPosition, SelectedFighter.RemainingMovePoints, SelectedFighter);
         _moveRangeTiles = new HashSet<Vector2Int>(reachable.Keys);
         _tileHighlighter.ClearMoveRange();
         _tileHighlighter.ClearMoveHover();
@@ -260,13 +342,18 @@ public class SelectionManager : MonoBehaviour
         SelectedAbility   = null;
         _previewedFighter = null;
         CurrentState      = SelectionState.Idle;
-        _areaBiasLeft   = true;
-        _lastHoveredPos = new Vector2Int(-1, -1);
+        _areaBiasLeft    = true;
+        _facingOverride  = null;
+        _lastHoveredPos  = new Vector2Int(-1, -1);
 
         ExitMoveMode();
         ClearRepositionState();
+        _secondaryAbility = null;
+        _multiSelectPicks.Clear();
+        _multiSelectIsSecondary = false;
         _tileHighlighter.ClearRange();
         _tileHighlighter.ClearShape();
+        _tileHighlighter.ClearMultiSelect();
 
         OnFighterDeselected?.Invoke();
     }
@@ -278,11 +365,12 @@ public class SelectionManager : MonoBehaviour
     {
         if (CurrentState != SelectionState.FighterSelected) return;
         if (SelectedFighter == null || SelectedFighter.RemainingMovePoints <= 0f) return;
+        if (SelectedFighter.IsMoving) return;
 
         if (InMoveMode) { ExitMoveMode(); return; } // toggle off
 
         InMoveMode = true;
-        var reachable = _pathfinder.GetReachableTiles(SelectedFighter.GridPosition, SelectedFighter.RemainingMovePoints);
+        var reachable = _pathfinder.GetReachableTiles(SelectedFighter.GridPosition, SelectedFighter.RemainingMovePoints, SelectedFighter);
         _moveRangeTiles = new HashSet<Vector2Int>(reachable.Keys);
         _tileHighlighter.ShowMoveRange(_moveRangeTiles);
 
@@ -300,21 +388,31 @@ public class SelectionManager : MonoBehaviour
         OnMoveModeChanged?.Invoke(false);
     }
 
-    private void TryMove(Vector2Int destination)
+    // async: RequestMove now steps the fighter through the path over real time (see
+    // MoveResolver/ProgressiveResolver) instead of resolving instantly. Input is blocked while
+    // that's in flight (see the IsMoving guard at the top of HandleTileClicked/SelectAbility/
+    // EnterMoveMode), so this can safely await the whole thing before refreshing the UI.
+    private async UniTaskVoid TryMove(Vector2Int destination)
     {
-        float prevRemaining = SelectedFighter.RemainingMovePoints;
-        BattleController.Instance.RequestMove(SelectedFighter, destination);
+        var fighter = SelectedFighter;
+        if (fighter == null) return;
 
-        if (SelectedFighter.RemainingMovePoints == prevRemaining)
+        float prevRemaining = fighter.RemainingMovePoints;
+        await BattleController.Instance.RequestMove(fighter, destination);
+
+        // Deselected (e.g. turn ended) while the move was animating — nothing left to refresh.
+        if (SelectedFighter != fighter) return;
+
+        if (fighter.RemainingMovePoints == prevRemaining)
             return; // move failed — no points were spent, position unchanged
 
         // Broadcast updated move points for the UI text
-        OnMovePointsChanged?.Invoke(SelectedFighter.RemainingMovePoints, SelectedFighter.Speed);
+        OnMovePointsChanged?.Invoke(fighter.RemainingMovePoints, fighter.Speed);
 
-        if (SelectedFighter.RemainingMovePoints > 0f)
+        if (fighter.RemainingMovePoints > 0f)
         {
             // Refresh range from new position with remaining points
-            var reachable = _pathfinder.GetReachableTiles(SelectedFighter.GridPosition, SelectedFighter.RemainingMovePoints);
+            var reachable = _pathfinder.GetReachableTiles(fighter.GridPosition, fighter.RemainingMovePoints, fighter);
             _moveRangeTiles = new HashSet<Vector2Int>(reachable.Keys);
             _tileHighlighter.ClearMoveRange();
             _tileHighlighter.ClearMoveHover();
@@ -330,16 +428,44 @@ public class SelectionManager : MonoBehaviour
 
     public void SelectAbility(Ability ability)
     {
+        if (SelectedFighter != null && SelectedFighter.IsMoving) return;
+
+        // Re-clicking the SAME ability while its own multi-select is already in progress means
+        // "confirm with whatever's picked so far" (the Use-button-again half of the design),
+        // not "restart targeting". Only applies to the primary phase — SelectedAbility is always
+        // null during a secondary-phase multi-select (cleared before that phase starts), so this
+        // can't accidentally fire there.
+        if (CurrentState == SelectionState.MultiTargeting && !_multiSelectIsSecondary &&
+            SelectedAbility == ability && _multiSelectPicks.Count >= 1)
+        {
+            ConfirmMultiSelect();
+            return;
+        }
+
         if (CurrentState != SelectionState.FighterSelected && CurrentState != SelectionState.Targeting)
             return;
 
         ExitMoveMode(); // leave move mode when switching to ability targeting
 
         SelectedAbility = ability;
-        CurrentState    = SelectionState.Targeting;
+
+        var primaryEffect = ability.PrimaryEffect;
+
+        // Fire OnAbilitySelected AFTER CurrentState settles in either branch — listeners (e.g.
+        // AbilityPanel deciding whether to keep the Use button clickable) need to read the real
+        // final state, not whatever it was before this call.
+        if (primaryEffect != null && primaryEffect.MaxTargets > 1 && primaryEffect.Shape == AbilityShape.Single)
+        {
+            EnterMultiTargeting(isSecondary: false);
+            Debug.Log($"[SelectionManager] Targeting with ability: {ability.Name}");
+            OnAbilitySelected?.Invoke(ability);
+            return;
+        }
+
+        CurrentState = SelectionState.Targeting;
 
         _tileHighlighter.ClearShape();
-        var validTargets = AbilityTargeting.GetValidTargetTiles(SelectedFighter, ability, _board);
+        var validTargets = AbilityTargeting.GetValidTargetTiles(SelectedFighter, ability.PrimaryEffect, _board);
         _tileHighlighter.ShowRange(validTargets);
 
         Debug.Log($"[SelectionManager] Targeting with ability: {ability.Name}");
@@ -348,6 +474,26 @@ public class SelectionManager : MonoBehaviour
 
     public void CancelTargeting()
     {
+        if (CurrentState == SelectionState.MultiTargeting)
+        {
+            // Covers both phases: cancelling out of a primary multi-select drops back to
+            // FighterSelected same as normal Targeting; cancelling a secondary-phase one gives up
+            // on the follow-up target entirely (the primary effect already resolved by this point,
+            // same as RepositionTargeting/SecondaryTargeting having no partial-undo today).
+            _multiSelectPicks.Clear();
+            _multiSelectIsSecondary = false;
+            SelectedAbility   = null;
+            _secondaryAbility = null;
+            CurrentState      = SelectionState.FighterSelected;
+
+            _tileHighlighter.ClearRange();
+            _tileHighlighter.ClearMultiSelect();
+            _tileHighlighter.ClearShape(); // clears the last hover-anchor preview, if any
+
+            OnTargetingCancelled?.Invoke();
+            return;
+        }
+
         if (CurrentState != SelectionState.Targeting) return;
 
         SelectedAbility = null;
@@ -359,11 +505,115 @@ public class SelectionManager : MonoBehaviour
         OnTargetingCancelled?.Invoke();
     }
 
+    // ── Multi-select targeting ──────────────────────────────────────────────
+
+    private void EnterMultiTargeting(bool isSecondary)
+    {
+        _multiSelectIsSecondary = isSecondary;
+        _multiSelectPicks.Clear();
+        CurrentState = SelectionState.MultiTargeting;
+
+        var ability = isSecondary ? _secondaryAbility : SelectedAbility;
+        var effect  = isSecondary ? ability?.SecondaryEffect : ability?.PrimaryEffect;
+        if (effect == null) return;
+
+        _tileHighlighter.ClearShape();
+        _tileHighlighter.ClearMultiSelect();
+        var validTargets = AbilityTargeting.GetValidTargetTiles(SelectedFighter, effect, _board);
+        _tileHighlighter.ShowRange(validTargets);
+
+        Debug.Log($"[SelectionManager] Multi-select targeting ({(isSecondary ? "secondary" : "primary")}) " +
+                  $"for {ability.Name} — up to {effect.MaxTargets} target(s)");
+    }
+
+    private void TryPickMultiTarget(Vector2Int pos)
+    {
+        var effect = CurrentTargetingEffect;
+        if (effect == null) return;
+
+        if (_multiSelectPicks.Contains(pos)) return; // already picked — right-click removes instead
+
+        var validTargets = AbilityTargeting.GetValidTargetTiles(SelectedFighter, effect, _board);
+        if (!validTargets.Contains(pos)) return;
+
+        var tile   = _board.GetTile(pos);
+        var target = tile?.OccupyingCharacter?.GetComponent<Fighter>();
+        if (target == null || target.IsDead) return;
+        if (!AbilityResolver.IsValidTarget(SelectedFighter, target, effect.TargetType)) return;
+
+        _multiSelectPicks.Add(pos);
+        _tileHighlighter.ShowMultiSelect(_multiSelectPicks);
+
+        Debug.Log($"[SelectionManager] Multi-select pick: {target.FighterName} ({_multiSelectPicks.Count}/{effect.MaxTargets})");
+
+        if (_multiSelectPicks.Count >= effect.MaxTargets)
+            ConfirmMultiSelect();
+    }
+
+    // Fires the ability (primary phase) or the deferred secondary effect (secondary phase)
+    // against every tile picked so far. Mirrors TryConfirmTarget/TryConfirmSecondaryTarget's
+    // tail ends exactly — the only real difference is where shapeTiles comes from (the pick
+    // list here, instead of one anchor's derived shape).
+    private void ConfirmMultiSelect()
+    {
+        if (_multiSelectPicks.Count == 0) return;
+
+        var fighter = SelectedFighter;
+        var picks   = new List<Vector2Int>(_multiSelectPicks);
+        var anchor  = picks[0]; // stand-in for logging/event purposes — multi-select has no single anchor
+
+        if (_multiSelectIsSecondary)
+        {
+            var ability = _secondaryAbility;
+
+            CurrentState            = SelectionState.FighterSelected;
+            _secondaryAbility       = null;
+            _multiSelectPicks.Clear();
+            _tileHighlighter.ClearRange();
+            _tileHighlighter.ClearMultiSelect();
+            _tileHighlighter.ClearShape(); // clears the last hover-anchor preview, if any
+
+            BattleController.Instance.RequestUseSecondaryEffect(fighter, ability, anchor, picks);
+
+            if (SelectedFighter != null)
+                OnMovePointsChanged?.Invoke(SelectedFighter.RemainingMovePoints, SelectedFighter.Speed);
+        }
+        else
+        {
+            var ability = SelectedAbility;
+
+            SelectedAbility = null;
+            CurrentState    = SelectionState.FighterSelected;
+            _multiSelectPicks.Clear();
+            _tileHighlighter.ClearRange();
+            _tileHighlighter.ClearMultiSelect();
+            _tileHighlighter.ClearShape(); // clears the last hover-anchor preview, if any
+
+            OnAbilityConfirmed?.Invoke(fighter, ability, anchor, picks);
+
+            // May synchronously fire OnFighterTurnEnded → Deselect().
+            BattleController.Instance.RequestUseAbility(fighter, ability, anchor, picks);
+
+            // Reposition-after-hit (RepositionRange > 0) isn't supported paired with multi-select
+            // — no ability combines them, and "which of N picked targets gets repositioned" has
+            // no single answer — so unlike TryConfirmTarget, there's no reposition check here.
+
+            if (ability.SecondaryEffect != null)
+            {
+                EnterSecondaryTargeting(ability);
+                return;
+            }
+
+            if (SelectedFighter != null)
+                OnMovePointsChanged?.Invoke(SelectedFighter.RemainingMovePoints, SelectedFighter.Speed);
+        }
+    }
+
     // ── Targeting ──────────────────────────────────────────────────────────
 
-    private void UpdateShapePreview(Vector2Int hoveredPos)
+    private void UpdateShapePreview(Vector2Int hoveredPos, AbilityEffect effect)
     {
-        var validTargets = AbilityTargeting.GetValidTargetTiles(SelectedFighter, SelectedAbility, _board);
+        var validTargets = AbilityTargeting.GetValidTargetTiles(SelectedFighter, effect, _board);
 
         if (!validTargets.Contains(hoveredPos))
         {
@@ -372,21 +622,21 @@ public class SelectionManager : MonoBehaviour
             return;
         }
 
-        var shapeTiles = AbilityTargeting.GetShapeTiles(SelectedFighter, SelectedAbility, hoveredPos, _board, _areaBiasLeft);
+        var shapeTiles = AbilityTargeting.GetShapeTiles(SelectedFighter, effect, hoveredPos, _board, _areaBiasLeft, _facingOverride);
         _tileHighlighter.ShowShape(shapeTiles, hoveredPos);
         _currentShapePreview = shapeTiles;
     }
 
     private void TryConfirmTarget(Vector2Int pos)
     {
-        var validTargets = AbilityTargeting.GetValidTargetTiles(SelectedFighter, SelectedAbility, _board);
+        var validTargets = AbilityTargeting.GetValidTargetTiles(SelectedFighter, SelectedAbility.PrimaryEffect, _board);
         if (!validTargets.Contains(pos))
         {
             Debug.Log("[SelectionManager] Clicked tile is not a valid target");
             return;
         }
 
-        var shapeTiles = AbilityTargeting.GetShapeTiles(SelectedFighter, SelectedAbility, pos, _board, _areaBiasLeft);
+        var shapeTiles = AbilityTargeting.GetShapeTiles(SelectedFighter, SelectedAbility.PrimaryEffect, pos, _board, _areaBiasLeft, _facingOverride);
 
         Debug.Log($"[SelectionManager] Ability confirmed: {SelectedAbility.Name} on anchor {pos}, affecting {shapeTiles.Count} tile(s)");
 
@@ -418,6 +668,61 @@ public class SelectionManager : MonoBehaviour
             EnterRepositionTargeting(repositionTarget, ability.RepositionRange);
             return;
         }
+
+        // If this ability has its own distinct follow-up target (e.g. Vemk Parlas's Sig), enter
+        // that phase instead of ending here.
+        if (ability.SecondaryEffect != null)
+        {
+            EnterSecondaryTargeting(ability);
+            return;
+        }
+
+        if (SelectedFighter != null)
+            OnMovePointsChanged?.Invoke(SelectedFighter.RemainingMovePoints, SelectedFighter.Speed);
+    }
+
+    // ── Secondary targeting ────────────────────────────────────────────────
+
+    private void EnterSecondaryTargeting(Ability ability)
+    {
+        _secondaryAbility = ability;
+
+        var effect = ability.SecondaryEffect;
+        if (effect != null && effect.MaxTargets > 1 && effect.Shape == AbilityShape.Single)
+        {
+            EnterMultiTargeting(isSecondary: true);
+            return;
+        }
+
+        CurrentState = SelectionState.SecondaryTargeting;
+
+        var validTargets = AbilityTargeting.GetValidTargetTiles(SelectedFighter, effect, _board);
+        _tileHighlighter.ShowRange(validTargets);
+
+        Debug.Log($"[SelectionManager] Secondary targeting phase for {ability.Name} — {validTargets.Count} valid tile(s)");
+    }
+
+    private void TryConfirmSecondaryTarget(Vector2Int pos)
+    {
+        var effect = _secondaryAbility.SecondaryEffect;
+        var validTargets = AbilityTargeting.GetValidTargetTiles(SelectedFighter, effect, _board);
+        if (!validTargets.Contains(pos))
+        {
+            Debug.Log("[SelectionManager] Secondary target: clicked tile is not valid");
+            return;
+        }
+
+        var shapeTiles = AbilityTargeting.GetShapeTiles(SelectedFighter, effect, pos, _board, _areaBiasLeft, _facingOverride);
+
+        var fighter = SelectedFighter;
+        var ability = _secondaryAbility;
+
+        CurrentState      = SelectionState.FighterSelected;
+        _secondaryAbility = null;
+        _tileHighlighter.ClearRange();
+        _tileHighlighter.ClearShape();
+
+        BattleController.Instance.RequestUseSecondaryEffect(fighter, ability, pos, shapeTiles);
 
         if (SelectedFighter != null)
             OnMovePointsChanged?.Invoke(SelectedFighter.RemainingMovePoints, SelectedFighter.Speed);

@@ -13,6 +13,8 @@ public class FighterInfoPanel : MonoBehaviour
     [SerializeField] private TextMeshProUGUI hpValueText;
     [SerializeField] private Slider          chargeSlider;
     [SerializeField] private TextMeshProUGUI chargeValueText;
+    [SerializeField] private Slider          shieldSlider;
+    [SerializeField] private TextMeshProUGUI shieldValueText;
 
     [Header("Movement")]
     [SerializeField] private TextMeshProUGUI moveText;
@@ -109,6 +111,14 @@ public class FighterInfoPanel : MonoBehaviour
             SetCharge(fighter.CurrentCharge, fighter.SigChargeReq);
         }
 
+        if (shieldSlider != null)
+        {
+            shieldSlider.interactable = false;
+            shieldSlider.minValue     = 0;
+            shieldSlider.maxValue     = Mathf.Max(1, fighter.Shield);
+        }
+        SetShield(fighter.Shield);
+
         if (portrait != null && fighter.Portrait != null)
         {
             portrait.sprite         = fighter.Portrait;
@@ -116,7 +126,8 @@ public class FighterInfoPanel : MonoBehaviour
         }
 
         UpdateMoveText(fighter.RemainingMovePoints, fighter.Speed);
-        if (moveButton != null) moveButton.interactable = fighter.RemainingMovePoints > 0f;
+        bool stunned = fighter.State.StatusEffects.Exists(e => e.Type == StatusEffectType.Stun);
+        if (moveButton != null) moveButton.interactable = fighter.RemainingMovePoints > 0f && !stunned;
         RefreshActivateButton();
 
         PopulateStats(fighter);
@@ -129,6 +140,7 @@ public class FighterInfoPanel : MonoBehaviour
         nameText.text     = string.Empty;
         SetHP(0, 0);
         SetCharge(0, 0);
+        SetShield(0);
         if (portrait        != null) portrait.sprite = null;
         if (moveText        != null) moveText.text   = string.Empty;
         if (moveButton      != null) moveButton.interactable      = false;
@@ -190,12 +202,29 @@ public class FighterInfoPanel : MonoBehaviour
         SetText(chargeValueText, max > 0 ? $"{Mathf.RoundToInt(current)}/{Mathf.RoundToInt(max)}" : string.Empty);
     }
 
+    // Shield has no fixed cap the way HP/charge do (AddShield just adds, no max stat), so the
+    // slider's max grows to fit whenever a bigger shield is granted, then drains visually as it
+    // absorbs damage — same "fills then drains" bar you'd expect from a shield, without needing
+    // a max-shield stat to exist anywhere.
+    private void SetShield(float current)
+    {
+        if (shieldSlider != null)
+        {
+            if (current > shieldSlider.maxValue) shieldSlider.maxValue = current;
+            shieldSlider.value = current;
+        }
+        SetText(shieldValueText, current > 0 ? $"{Mathf.RoundToInt(current)}" : string.Empty);
+    }
+
     // ── HP / Move event handlers ───────────────────────────────────────────
 
+    // Fired for HP changes AND shield changes (see Fighter.TakeDamage/AddShield) — there's no
+    // separate shield event, so refresh both here.
     private void HandleHPChanged(Fighter fighter)
     {
         if (fighter != _displayedFighter) return;
         SetHP(fighter.CurrentHP, fighter.MaxHP);
+        SetShield(fighter.Shield);
     }
 
     private void HandleChargeChanged(Fighter fighter)

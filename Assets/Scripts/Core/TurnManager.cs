@@ -15,6 +15,7 @@ public class TurnManager : MonoBehaviour
     public Fighter ActiveFighter { get; private set; }
 
     // ── Events (UI subscribes to these) ────────────────────────────────────
+    public static event Action          OnGameStart;          // fires once, before Round 1 starts
     public static event Action<int>     OnRoundStarted;       // round number
     public static event Action<int>     OnActivationChanged;  // team id whose pick it is
     public static event Action<Fighter> OnFighterActivated;
@@ -42,6 +43,8 @@ public class TurnManager : MonoBehaviour
 
     public void StartRound()
     {
+        bool isGameStart = RoundNumber == 0;
+
         RoundNumber++;
         ActiveFighter = null;
 
@@ -50,6 +53,12 @@ public class TurnManager : MonoBehaviour
 
         // Round 1: respect draft result. Subsequent rounds alternate from last round's starter.
         ActiveTeamId = RoundNumber == 1 ? MatchSetup.FirstActingTeam : (ActiveTeamId == 1 ? 2 : 1);
+
+        if (isGameStart)
+        {
+            Debug.Log("[TurnManager] Game started.");
+            OnGameStart?.Invoke();
+        }
 
         Debug.Log($"[TurnManager] Round {RoundNumber} started. Team {ActiveTeamId} picks first.");
         OnRoundStarted?.Invoke(RoundNumber);
@@ -145,6 +154,18 @@ public class TurnManager : MonoBehaviour
         StartRound();
     }
 
+    // [DEBUG] Forces a game-over for testing, bypassing the normal all-fighters-dead check.
+    // Fires the exact same OnGameOver event the real check does, so anything that reacts to a
+    // real game-over (GameOverHandler, End Turn button, and eventually the online sync broadcast)
+    // reacts identically to a forced one — see DebugCommands.cs.
+    public void ForceGameOver(int winningTeam)
+    {
+        if (_gameOver) return;
+        _gameOver = true;
+        Debug.Log($"[TurnManager] (DEBUG) Forced game over — Team {winningTeam} wins!");
+        OnGameOver?.Invoke(winningTeam);
+    }
+
     // ── Helpers ────────────────────────────────────────────────────────────
 
     private bool CheckGameOver()
@@ -197,6 +218,13 @@ public class TurnManager : MonoBehaviour
         ActiveTeamId  = nextTeamId;
         OnFighterTurnEnded?.Invoke(ended);
         OnActivationChanged?.Invoke(ActiveTeamId);
+    }
+
+    public void NetworkApplyGameOver(int winningTeamId)
+    {
+        if (_gameOver) return;
+        _gameOver = true;
+        OnGameOver?.Invoke(winningTeamId);
     }
 
     public void NetworkApplyRoundStarted(int roundNumber, int firstTeamId)

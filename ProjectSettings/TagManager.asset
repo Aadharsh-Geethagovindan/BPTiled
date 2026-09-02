@@ -44,6 +44,9 @@ TagManager:
   - name: Board
     uniqueID: 2253606325
     locked: 0
+  - name: Particles
+    uniqueID: 3066100755
+    locked: 0
   - name: Characters
     uniqueID: 1974738029
     locked: 0

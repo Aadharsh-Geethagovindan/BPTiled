@@ -12,7 +12,7 @@ public class Pathfinder
 
     // Returns list of tiles to traverse, excluding start, including end
     // Returns null if no path found
-    public List<Vector2Int> FindPath(Vector2Int start, Vector2Int end)
+    public List<Vector2Int> FindPath(Vector2Int start, Vector2Int end, Fighter mover)
     {
         if (!_board.IsInBounds(start) || !_board.IsInBounds(end)) return null;
         if (start == end) return new List<Vector2Int>();
@@ -21,7 +21,12 @@ public class Pathfinder
         var closedSet = new HashSet<Vector2Int>();
         var nodeMap = new Dictionary<Vector2Int, AStarNode>();
 
-        var startNode = new AStarNode(start, null, 0, ManhattanDistance(start, end));
+        // Heuristic is 0 (i.e. this is plain Dijkstra, not true A*) rather than Manhattan
+        // distance — Manhattan assumes a uniform cost-1 per tile, which overestimates remaining
+        // cost once a mover's terrain-cost multiplier can drop below 1 (e.g. Sedra's Aetherian
+        // Momentum), making the heuristic inadmissible and risking a non-optimal path. The board
+        // is small enough that the search-space cost of dropping the heuristic is negligible.
+        var startNode = new AStarNode(start, null, 0, 0f);
         openSet.Add(startNode);
         nodeMap[start] = startNode;
 
@@ -43,7 +48,7 @@ public class Pathfinder
                 if (!neighbor.IsPassable) continue;
                 if (neighbor.IsOccupied && neighborPos != end) continue;
 
-                float newG = current.G + neighbor.MovementCost;
+                float newG = current.G + mover.GetEffectiveTerrainCost(neighbor);
 
                 if (nodeMap.TryGetValue(neighborPos, out var existingNode))
                 {
@@ -59,7 +64,7 @@ public class Pathfinder
                         neighborPos,
                         current,
                         newG,
-                        ManhattanDistance(neighborPos, end));
+                        0f);
                     openSet.Add(newNode);
                     nodeMap[neighborPos] = newNode;
                 }
@@ -71,7 +76,7 @@ public class Pathfinder
 
     // Returns all tiles reachable within a movement budget.
     // Dictionary value is the actual move cost to reach that tile (useful for subtracting from remaining points).
-    public Dictionary<Vector2Int, float> GetReachableTiles(Vector2Int start, float movementPoints)
+    public Dictionary<Vector2Int, float> GetReachableTiles(Vector2Int start, float movementPoints, Fighter mover)
     {
         var costs    = new Dictionary<Vector2Int, float>(); // position -> cost to reach
         var frontier = new Dictionary<Vector2Int, float>(); // position -> best known cost
@@ -93,7 +98,7 @@ public class Pathfinder
                 if (!neighbor.IsPassable) continue;
                 if (neighbor.IsOccupied) continue;
 
-                float newCost = currentCost + neighbor.MovementCost;
+                float newCost = currentCost + mover.GetEffectiveTerrainCost(neighbor);
                 if (newCost <= movementPoints)
                 {
                     if (!frontier.ContainsKey(neighborPos) || frontier[neighborPos] > newCost)
@@ -139,11 +144,6 @@ public class Pathfinder
         }
         path.Reverse();
         return path;
-    }
-
-    private float ManhattanDistance(Vector2Int a, Vector2Int b)
-    {
-        return Mathf.Abs(a.x - b.x) + Mathf.Abs(a.y - b.y);
     }
 
     private class AStarNode

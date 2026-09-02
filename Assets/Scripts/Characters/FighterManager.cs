@@ -7,6 +7,15 @@ public class FighterManager : MonoBehaviour
 
     [SerializeField] private GameObject fighterPrefab;
     [SerializeField] private Transform boardRoot;
+    [SerializeField] private GameObject teamAuraPrefab; // Assets/Prefabs/Particles/ActiveFighterAura
+
+    [Header("Team Aura — online, relative to local player")]
+    [SerializeField] private Color myAuraColor    = new Color(1.00f, 0.882f, 0.00f); // matches the CharSelect confirm-button accent gold
+    [SerializeField] private Color enemyAuraColor = new Color(0.9f, 0.25f, 0.25f);
+
+    [Header("Team Aura — hotseat, fixed by team number (no single local perspective)")]
+    [SerializeField] private Color team1AuraColor = new Color(0.3f, 0.5f, 1f);
+    [SerializeField] private Color team2AuraColor = new Color(0.9f, 0.25f, 0.25f);
     private List<Fighter> _allFighters = new List<Fighter>();
     public IReadOnlyList<Fighter> AllFighters => _allFighters;
     private Board _board;
@@ -59,6 +68,7 @@ public class FighterManager : MonoBehaviour
                            dmgMult, accuracy, dodge, critRate, critDmg,
                            resArcane, resElemental, resForce, resCorrupt,
                            gridPosition, _board);
+        fighter.SetSpecies(data.species);
 
         // Sprite — fall back to team colour if asset is missing
         var sprite = FighterLoader.LoadSprite(data.imageName);
@@ -66,6 +76,8 @@ public class FighterManager : MonoBehaviour
             fighter.SetSprite(sprite);
         else
             fighter.SetColor(teamId == 1 ? Color.blue : Color.red);
+
+        obj.AddComponent<FighterTeamAura>().Initialize(teamAuraPrefab, GetTeamAuraColor(teamId));
 
         // Build abilities from move data; second Skill move gets Skill2 slot
         if (data.moves != null)
@@ -89,6 +101,17 @@ public class FighterManager : MonoBehaviour
         tile.OccupyingCharacter = obj;
         _allFighters.Add(fighter);
         return fighter;
+    }
+
+    // Relative to the local player when there is one (online), so "my color" is consistent
+    // across games regardless of which team number you're assigned. Falls back to a fixed
+    // per-team-number color in hotseat, where there's no single local perspective.
+    private Color GetTeamAuraColor(int fighterTeamId)
+    {
+        if (MatchSetup.LocalTeamId != 0)
+            return fighterTeamId == MatchSetup.LocalTeamId ? myAuraColor : enemyAuraColor;
+
+        return fighterTeamId == 1 ? team1AuraColor : team2AuraColor;
     }
 
     public void RegisterOnBoard(Fighter fighter)

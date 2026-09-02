@@ -92,12 +92,25 @@ public class AbilityPanel : MonoBehaviour
 
     private void PopulateFighter(Fighter fighter)
     {
-        _currentFighter = fighter;
+        bool isNewFighter = fighter != _currentFighter;
+        _currentFighter   = fighter;
         RefreshSlotButtons();
         SetTargetingMode(false);
-        var first = GetAbilityInSlot(AbilitySlot.Normal) ?? GetFirstAbility();
-        if (first != null) DisplayAbility(first);
-        else ClearDisplay();
+
+        if (isNewFighter || _displayedAbility == null)
+        {
+            var first = GetAbilityInSlot(AbilitySlot.Normal) ?? GetFirstAbility();
+            if (first != null) DisplayAbility(first);
+            else ClearDisplay();
+        }
+        else
+        {
+            // Same fighter as last populate (preview -> activate, or any mid-turn refresh like
+            // move/cancel) — keep whatever slot was already being viewed instead of snapping
+            // back to Normal. Still re-run DisplayAbility so cooldown text / Use button state
+            // stay current.
+            DisplayAbility(_displayedAbility);
+        }
     }
 
     private void OnFighterDeselected()
@@ -171,8 +184,9 @@ public class AbilityPanel : MonoBehaviour
         bool onCooldown = _displayedAbility.IsOnCooldown;
         bool sigBlocked = _displayedAbility.Slot == AbilitySlot.Sig
                           && _currentFighter.CurrentCharge < _currentFighter.SigChargeReq;
+        bool stunned    = _currentFighter.State.StatusEffects.Exists(e => e.Type == StatusEffectType.Stun);
 
-        useButton.interactable = !isPassive && !onCooldown && !sigBlocked;
+        useButton.interactable = !isPassive && !onCooldown && !sigBlocked && !stunned;
     }
 
     private void RefreshSlotButtons()
@@ -200,7 +214,13 @@ public class AbilityPanel : MonoBehaviour
 
     private void SetTargetingMode(bool targeting)
     {
-        useButton.interactable    = !targeting;
+        // During multi-select, Use doubles as "confirm with whatever's picked so far" — it has
+        // to stay clickable, unlike normal targeting where a world click is what confirms and
+        // Use is disabled to stop it from restarting targeting mid-flow.
+        bool multiSelect = targeting && SelectionManager.Instance != null &&
+                            SelectionManager.Instance.CurrentState == SelectionState.MultiTargeting;
+
+        useButton.interactable    = !targeting || multiSelect;
         cancelButton.interactable = targeting;
 
         // Re-apply sig-charge block when exiting targeting mode

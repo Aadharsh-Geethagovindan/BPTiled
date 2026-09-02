@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-// Calculates the outcome of an ability against a single target.
+// Calculates the outcome of one ability effect against a single target.
 // Pure calculation — no state mutation. Safe to call before animations play.
 public static class HitResolver
 {
@@ -9,16 +9,21 @@ public static class HitResolver
     // Prevents abilities from becoming literally impossible to land.
     private const float MinHitChance = 0.05f;
 
-    public static HitResult Calculate(Fighter caster, Fighter target, Ability ability)
+    public static HitResult Calculate(Fighter caster, Fighter target, Ability ability, AbilityEffect effect)
     {
-        // Abilities targeting allies/self always land — only enemy-targeted abilities roll hit
-        bool alwaysHits = ability.TargetType == AbilityTargetType.Ally
-                       || ability.TargetType == AbilityTargetType.Self
-                       || ability.TargetType == AbilityTargetType.AllyOrSelf
-                       || ability.TargetType == AbilityTargetType.Tile;
+        // Effects targeting allies/self always land — only enemy-targeted effects roll hit
+        bool alwaysHits = effect.TargetType == AbilityTargetType.Ally
+                       || effect.TargetType == AbilityTargetType.Self
+                       || effect.TargetType == AbilityTargetType.AllyOrSelf
+                       || effect.TargetType == AbilityTargetType.Tile;
 
-        bool isHit  = alwaysHits || RollHit(caster, target);
-        bool isCrit = isHit && ability.Damage > 0 && RollCrit(caster);
+        bool isHit = alwaysHits || RollHit(caster, target);
+
+        // A dynamic value can make an effect deal damage even when its fixed base is 0 (not used
+        // by any current fighter, but keeps crit-eligibility correct for future ones).
+        bool dealsDamage = effect.Damage > 0
+                        || (effect.DynamicValue != null && effect.DynamicValue.ValueType == DynamicValueType.Damage);
+        bool isCrit = isHit && dealsDamage && RollCrit(caster);
 
         int finalDamage    = 0;
         int finalHealing   = 0;
@@ -28,20 +33,35 @@ public static class HitResolver
 
         if (isHit)
         {
-            if (ability.Damage > 0)
-                finalDamage    = CalculateDamage(caster, target, ability, isCrit);
+            // Dynamic bonus is folded into the base value before the damage pipeline runs, so it
+            // scales with damage multiplier/essence bonus/crit/resistance exactly like a bigger
+            // fixed Damage/Healing/Shielding value would — not a flat post-mitigation add-on.
+            int dynamicDamage = 0, dynamicHealing = 0, dynamicShielding = 0;
+            if (effect.DynamicValue != null)
+            {
+                int bonus = DynamicValueResolver.ComputeBonus(effect.DynamicValue, caster, target);
+                switch (effect.DynamicValue.ValueType)
+                {
+                    case DynamicValueType.Damage:    dynamicDamage    = bonus; break;
+                    case DynamicValueType.Healing:   dynamicHealing   = bonus; break;
+                    case DynamicValueType.Shielding: dynamicShielding = bonus; break;
+                }
+            }
 
-            if (ability.Healing > 0)
-                finalHealing   = ability.Healing;
+            if (dealsDamage)
+                finalDamage    = CalculateDamage(caster, target, ability, effect, isCrit, effect.Damage + dynamicDamage);
 
-            if (ability.Shielding > 0)
-                finalShielding = ability.Shielding;
+            if (effect.Healing > 0 || dynamicHealing > 0)
+                finalHealing   = effect.Healing + dynamicHealing;
 
-            procdStatusEffects  = RollStatusEffects(ability);
-            procdInstantEffects = RollInstantEffects(ability);
+            if (effect.Shielding > 0 || dynamicShielding > 0)
+                finalShielding = effect.Shielding + dynamicShielding;
+
+            procdStatusEffects  = RollStatusEffects(caster, target, effect);
+            procdInstantEffects = RollInstantEffects(effect);
         }
 
-        return new HitResult(caster, target, ability, isHit, isCrit,
+        return new HitResult(caster, target, effect, isHit, isCrit,
                              finalDamage, finalHealing, finalShielding,
                              procdStatusEffects, procdInstantEffects);
     }
@@ -60,15 +80,19 @@ public static class HitResolver
         return Random.value < caster.GetModifiedCritRate();
     }
 
-    // Returns only the status effects whose applyChance roll succeeded.
-    private static List<StatusEffect> RollStatusEffects(Ability ability)
+    // Returns only the status effects that passed their condition (if any) and applyChance roll.
+    // Condition is checked against pre-cast state — caster/target haven't been mutated by this
+    // ability yet at this point, so e.g. Faru's Sharpen Blade correctly reads his buffs from
+    // before Sharpened itself would be granted, not after.
+    private static List<StatusEffect> RollStatusEffects(Fighter caster, Fighter target, AbilityEffect effect)
     {
-        if (ability.StatusEffectsToApply == null || ability.StatusEffectsToApply.Count == 0)
+        if (effect.StatusEffectsToApply == null || effect.StatusEffectsToApply.Count == 0)
             return null;
 
         var result = new List<StatusEffect>();
-        foreach (var se in ability.StatusEffectsToApply)
+        foreach (var se in effect.StatusEffectsToApply)
         {
+            if (!DynamicValueResolver.ConditionMet(se.Condition, caster, target)) continue;
             if (Random.value <= se.ApplyChance)
                 result.Add(new StatusEffect(se.Name, se.Type, se.Essence, se.Magnitude, se.Duration, se.IsDebuff));
         }
@@ -76,13 +100,13 @@ public static class HitResolver
     }
 
     // Returns only the instant effects whose applyChance roll succeeded.
-    private static List<AbilityInstantEffect> RollInstantEffects(Ability ability)
+    private static List<AbilityInstantEffect> RollInstantEffects(AbilityEffect effect)
     {
-        if (ability.InstantEffectsToApply == null || ability.InstantEffectsToApply.Count == 0)
+        if (effect.InstantEffectsToApply == null || effect.InstantEffectsToApply.Count == 0)
             return null;
 
         var result = new List<AbilityInstantEffect>();
-        foreach (var ie in ability.InstantEffectsToApply)
+        foreach (var ie in effect.InstantEffectsToApply)
         {
             if (Random.value <= ie.ApplyChance)
                 result.Add(ie);
@@ -92,12 +116,12 @@ public static class HitResolver
 
     // ── Damage formula ─────────────────────────────────────────────────────
 
-    private static int CalculateDamage(Fighter caster, Fighter target, Ability ability, bool isCrit)
+    private static int CalculateDamage(Fighter caster, Fighter target, Ability ability, AbilityEffect effect, bool isCrit, int baseDamage)
     {
         if (ability.Essence == AbilityEssence.True)
         {
             // True damage: no multipliers, no resistance, crit still applies
-            float trueDmg = ability.Damage * (isCrit ? caster.GetModifiedCritDmg() : 1f);
+            float trueDmg = baseDamage * (isCrit ? caster.GetModifiedCritDmg() : 1f);
             return Mathf.RoundToInt(trueDmg);
         }
 
@@ -106,7 +130,7 @@ public static class HitResolver
         float resistance   = target.GetModifiedResistance(ability.Essence);
         float critMult     = isCrit ? caster.GetModifiedCritDmg() : 1f;
 
-        float damage = ability.Damage * dmgMult * (1f + essenceBonus) * critMult * (1f - resistance);
+        float damage = baseDamage * dmgMult * (1f + essenceBonus) * critMult * (1f - resistance);
         return Mathf.Max(0, Mathf.RoundToInt(damage));
     }
 }

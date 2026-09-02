@@ -47,9 +47,8 @@ public static class FighterLoader
 
     // ── Ability building ───────────────────────────────────────────────────
 
-    // Maps one FighterMoveData → Ability.
-    // Passives are built as display-only (no targeting data).
-    // Multi-effect moves: first effect drives the shape; future work can expand this.
+    // Maps one FighterMoveData → Ability. Passives are built as display-only (no targeting data).
+    // Every entry in move.effects becomes its own AbilityEffect — see BuildEffect.
     public static Ability BuildAbility(FighterMoveData move)
     {
         // "Signature" in JSON doesn't match the enum name "Sig" — handle manually
@@ -79,24 +78,12 @@ public static class FighterLoader
         if (move.effects == null || move.effects.Length == 0)
             return null;
 
-        var effect = move.effects[0];
-
-        if (!Enum.TryParse(effect.shape,      true, out AbilityShape      shape))      shape      = AbilityShape.Single;
-        if (!Enum.TryParse(effect.targetType, true, out AbilityTargetType targetType)) targetType = AbilityTargetType.Enemy;
-
         var ability = new Ability
         {
-            Name          = move.name,
-            Description   = move.mechanics,
-            Slot          = slot,
-            Essence       = essence,
-            Shape         = shape,
-            Range         = effect.range,
-            MinRange      = effect.minRange,
-            TargetType    = targetType,
-            Damage        = effect.damage,
-            Healing       = effect.healing,
-            Shielding     = effect.shielding,
+            Name            = move.name,
+            Description     = move.mechanics,
+            Slot            = slot,
+            Essence         = essence,
             BaseCooldown    = move.cooldown,
             BaseSigCharge   = move.baseSigCharge,
             Knockback       = move.knockback,
@@ -105,26 +92,54 @@ public static class FighterLoader
             RepositionRange = move.repositionRange,
         };
 
+        foreach (var effectData in move.effects)
+            ability.Effects.Add(BuildEffect(effectData));
+
+        return ability;
+    }
+
+    // Maps one FighterEffectData entry (one item in a move's "effects" JSON array) → AbilityEffect.
+    private static AbilityEffect BuildEffect(FighterEffectData effectData)
+    {
+        if (!Enum.TryParse(effectData.shape,      true, out AbilityShape      shape))      shape      = AbilityShape.Single;
+        if (!Enum.TryParse(effectData.targetType, true, out AbilityTargetType targetType)) targetType = AbilityTargetType.Enemy;
+
+        var effect = new AbilityEffect
+        {
+            TargetType              = targetType,
+            Shape                   = shape,
+            Range                   = effectData.range,
+            MinRange                = effectData.minRange,
+            Damage                  = effectData.damage,
+            Healing                 = effectData.healing,
+            Shielding               = effectData.shielding,
+            RequiresSecondaryTarget = effectData.requiresSecondaryTarget,
+            // 0/absent in JSON means "not specified" (JsonUtility's int default), not "zero
+            // targets" — default it to 1 (today's normal single-target behavior) rather than
+            // passing the raw 0 through.
+            MaxTargets              = effectData.maxTargets > 0 ? effectData.maxTargets : 1,
+        };
+
         // Box: parse "WxH" (e.g. "2x3") — all other shapes: parse plain int (e.g. "3")
         if (shape == AbilityShape.Box)
         {
-            var parts = (effect.shapeSize ?? "1x1").Split('x');
-            ability.ShapeWidth  = parts.Length >= 1 && int.TryParse(parts[0], out int w) ? w : 1;
-            ability.ShapeHeight = parts.Length >= 2 && int.TryParse(parts[1], out int h) ? h : 1;
+            var parts = (effectData.shapeSize ?? "1x1").Split('x');
+            effect.ShapeWidth  = parts.Length >= 1 && int.TryParse(parts[0], out int w) ? w : 1;
+            effect.ShapeHeight = parts.Length >= 2 && int.TryParse(parts[1], out int h) ? h : 1;
         }
         else
         {
-            ability.ShapeSize = int.TryParse(effect.shapeSize, out int s) ? s : 1;
+            effect.ShapeSize = int.TryParse(effectData.shapeSize, out int s) ? s : 1;
         }
 
         // Instant effects
-        if (effect.instantEffects != null)
+        if (effectData.instantEffects != null)
         {
-            foreach (var ie in effect.instantEffects)
+            foreach (var ie in effectData.instantEffects)
             {
                 if (!Enum.TryParse(ie.type, true, out InstantEffectType ieType)) continue;
 
-                ability.InstantEffectsToApply.Add(new AbilityInstantEffect
+                effect.InstantEffectsToApply.Add(new AbilityInstantEffect
                 {
                     Type        = ieType,
                     Magnitude   = ie.magnitude,
@@ -134,13 +149,13 @@ public static class FighterLoader
         }
 
         // Status effects
-        if (effect.statusEffects != null)
+        if (effectData.statusEffects != null)
         {
-            foreach (var se in effect.statusEffects)
+            foreach (var se in effectData.statusEffects)
             {
                 if (!Enum.TryParse(se.type, true, out StatusEffectType seType)) continue;
 
-                ability.StatusEffectsToApply.Add(new AbilityStatusEffect
+                effect.StatusEffectsToApply.Add(new AbilityStatusEffect
                 {
                     Name        = se.name,
                     Type        = seType,
@@ -149,14 +164,19 @@ public static class FighterLoader
                     Duration    = se.duration,
                     IsDebuff    = se.isDebuff,
                     ApplyChance = se.applyChance <= 0f ? 1f : se.applyChance,
+                    Condition   = BuildCondition(se.condition),
                 });
             }
         }
 
+        // Dynamic value — guard with valueType check since JsonUtility never returns null for class fields
+        if (effectData.dynamicValue != null && !string.IsNullOrEmpty(effectData.dynamicValue.valueType))
+            effect.DynamicValue = BuildDynamicValue(effectData.dynamicValue);
+
         // Tile effect — JsonUtility never returns null for class fields; guard with name check
-        if (effect.tileEffect != null && !string.IsNullOrEmpty(effect.tileEffect.name))
+        if (effectData.tileEffect != null && !string.IsNullOrEmpty(effectData.tileEffect.name))
         {
-            var td = effect.tileEffect;
+            var td = effectData.tileEffect;
 
             // JSON uses short names ("TurnEnd", "OnEnter") — try with prefix fallback
             string triggerStr = td.triggerOn ?? string.Empty;
@@ -174,14 +194,16 @@ public static class FighterLoader
 
             var tileEffect = new AbilityTileEffect
             {
-                Name             = td.name,
-                Duration         = td.duration,
-                Trigger          = trigger,
-                Affinity         = affinity,
-                Damage           = td.damage,
-                Healing          = td.healing,
-                Shielding        = td.shielding,
-                DestroyOnTrigger = td.destroyOnTrigger,
+                Name                   = td.name,
+                Duration               = td.duration,
+                Trigger                = trigger,
+                Affinity               = affinity,
+                Damage                 = td.damage,
+                Healing                = td.healing,
+                Shielding              = td.shielding,
+                DestroyOnTrigger       = td.destroyOnTrigger,
+                ExcludedSpecies        = td.excludedSpecies,
+                RemoveRandomBuffChance = td.removeRandomBuffChance,
             };
 
             if (td.statusEffects != null)
@@ -198,13 +220,45 @@ public static class FighterLoader
                         Duration    = se.duration,
                         IsDebuff    = se.isDebuff,
                         ApplyChance = se.applyChance <= 0f ? 1f : se.applyChance,
+                        Condition   = BuildCondition(se.condition),
                     });
                 }
             }
 
-            ability.TileEffectToPlace = tileEffect;
+            if (td.dynamicValue != null && !string.IsNullOrEmpty(td.dynamicValue.valueType))
+                tileEffect.DynamicValue = BuildDynamicValue(td.dynamicValue);
+
+            effect.TileEffectToPlace = tileEffect;
         }
 
-        return ability;
+        return effect;
+    }
+
+    private static EffectCondition BuildCondition(FighterConditionData data)
+    {
+        if (data == null || string.IsNullOrEmpty(data.source)) return null;
+        if (!Enum.TryParse(data.source, true, out DynamicValueSource source)) return null;
+
+        return new EffectCondition
+        {
+            Source     = source,
+            StatusName = data.statusName,
+            MinCount   = data.minCount,
+        };
+    }
+
+    private static DynamicValue BuildDynamicValue(FighterDynamicValueData data)
+    {
+        if (!Enum.TryParse(data.valueType, true, out DynamicValueType valueType)) valueType = DynamicValueType.Damage;
+        if (!Enum.TryParse(data.source,    true, out DynamicValueSource source))  source    = DynamicValueSource.CasterBuffs;
+
+        return new DynamicValue
+        {
+            ValueType      = valueType,
+            Source         = source,
+            StatusName     = data.statusName,
+            AmountPerStack = data.amountPerStack,
+            IsConsumed     = data.isConsumed,
+        };
     }
 }
